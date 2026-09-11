@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <title>Toy Rush - Re-Volt Arcade</title>
+  <title>Toy Rush - House Grand Prix</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
     html, body {
@@ -14,47 +14,47 @@
     }
     canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; display: block; }
 
-    /* UI СИСТЕМА ТА ЕКРАНИ МЕНЮ */
+    /* МЕНЮ ТА UI */
     .screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       z-index: 20; display: none; flex-direction: column;
       justify-content: space-between; padding: env(safe-area-inset-top, 20px) 20px env(safe-area-inset-bottom, 20px) 20px;
-      background: radial-gradient(circle at center, rgba(20,30,48,0.75) 0%, rgba(10,14,22,0.95) 100%);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      background: radial-gradient(circle at center, rgba(18,25,38,0.85) 0%, rgba(8,12,18,0.98) 100%);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     }
     .active-screen { display: flex; }
 
-    .menu-header { text-align: center; margin-top: 20px; }
+    .menu-header { text-align: center; margin-top: 15px; }
     .game-title {
-      font-size: 38px; font-weight: 900; font-style: italic; letter-spacing: 2px;
+      font-size: 34px; font-weight: 900; font-style: italic; letter-spacing: 2px;
       background: linear-gradient(180deg, #ffd32a 0%, #ff3f34 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       text-shadow: 0 4px 20px rgba(255, 63, 52, 0.4);
     }
-    .game-subtitle { font-size: 13px; color: #a4b0be; letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+    .game-subtitle { font-size: 12px; color: #a4b0be; letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
 
-    .menu-content { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 320px; margin: auto; }
+    .menu-content { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; margin: auto; }
     
     .btn-action {
       background: linear-gradient(180deg, #1e272e 0%, #0abde3 100%);
-      border: 2px solid #48dbfb; color: #fff; padding: 15px 20px;
-      font-size: 16px; font-weight: 800; border-radius: 14px; text-transform: uppercase;
+      border: 2px solid #48dbfb; color: #fff; padding: 14px 20px;
+      font-size: 15px; font-weight: 800; border-radius: 14px; text-transform: uppercase;
       display: flex; align-items: center; justify-content: center; gap: 10px;
       box-shadow: 0 6px 15px rgba(10, 189, 227, 0.3); outline: none;
     }
-    .btn-action:active { transform: scale(0.96); filter: brightness(1.2); }
+    .btn-action:active { transform: scale(0.96); }
     .btn-secondary {
       background: rgba(44, 62, 80, 0.8); border: 1px solid rgba(255,255,255,0.2);
-      box-shadow: none; font-size: 14px; padding: 12px;
+      box-shadow: none; font-size: 13px; padding: 12px;
     }
 
-    /* Гараж та вибір */
+    /* Гараж */
     .card-selector {
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
       border-radius: 16px; padding: 16px; text-align: center;
     }
-    .card-title { font-size: 20px; font-weight: 800; color: #ffd32a; margin-bottom: 6px; }
-    .card-desc { font-size: 13px; color: #c8d6e5; line-height: 1.4; }
+    .card-title { font-size: 20px; font-weight: 800; color: #ffd32a; margin-bottom: 4px; }
+    .card-desc { font-size: 12px; color: #c8d6e5; line-height: 1.4; }
 
     /* Ігровий HUD */
     #hud {
@@ -62,8 +62,8 @@
       display: none; justify-content: space-between; align-items: center; z-index: 10; pointer-events: none;
     }
     .hud-chip {
-      background: rgba(15, 20, 32, 0.9); padding: 8px 14px; border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.2); font-size: 14px; font-weight: 800;
+      background: rgba(12, 17, 27, 0.9); padding: 8px 14px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.2); font-size: 13px; font-weight: 800;
     }
     .hud-interactive { pointer-events: auto; }
 
@@ -75,13 +75,13 @@
     }
     .control-col { display: flex; gap: 12px; align-items: flex-end; pointer-events: auto; }
     .t-btn {
-      width: 68px; height: 68px; border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, 0.4); background: rgba(20, 26, 40, 0.85);
-      color: #fff; font-size: 26px; font-weight: bold; display: flex;
+      width: 66px; height: 66px; border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.4); background: rgba(20, 26, 40, 0.88);
+      color: #fff; font-size: 24px; font-weight: bold; display: flex;
       align-items: center; justify-content: center; outline: none;
     }
     .t-btn:active { background: rgba(255, 255, 255, 0.4); transform: scale(0.92); }
-    #b-rst { width: 46px; height: 46px; font-size: 18px; background: rgba(235, 77, 75, 0.85); }
+    #b-rst { width: 44px; height: 44px; font-size: 16px; background: rgba(235, 77, 75, 0.85); }
     #b-act { background: rgba(240, 147, 43, 0.9); display: none; }
   </style>
 </head>
@@ -91,21 +91,21 @@
   <div id="screen-main" class="screen active-screen">
     <div class="menu-header">
       <div class="game-title">TOY RUSH</div>
-      <div class="game-subtitle">Re-Volt RC Championship</div>
+      <div class="game-subtitle">House Grand Prix • Re-Volt Edition</div>
     </div>
     <div class="menu-content">
-      <button class="btn-action" onclick="showScreen('screen-garage')">🏁 Одиночна гра</button>
-      <button class="btn-action btn-secondary" onclick="showScreen('screen-multi')">👥 Онлайн Мультиплеєр</button>
-      <button class="btn-action btn-secondary" onclick="alert('Фізика: Arcade 3D\nРендер: WebGL WebKit\nВерсія: v0.3 Core')">⚙️ Налаштування</button>
+      <button class="btn-action" onclick="showScreen('screen-garage')">🏁 Гонка по будинку</button>
+      <button class="btn-action btn-secondary" onclick="alert('Підключення 2-х телефонів буде увімкнено після затвердження геометрії кімнат!')">👥 Онлайн Мультиплеєр</button>
+      <button class="btn-action btn-secondary" onclick="alert('Локація: Двоповерховий будинок\nКімнати: Вітальня, Кухня, Кабінет, Спальня\nРушій: WebGL Three.js')">ℹ️ Про карту</button>
     </div>
-    <div style="text-align:center; font-size:11px; color:#576574;">RC Micro Machines Simulation</div>
+    <div style="text-align:center; font-size:11px; color:#636e72;">RC Micro Machines Simulation</div>
   </div>
 
-  <!-- ГАРАЖ: ВИБІР МАШИНИ -->
+  <!-- ГАРАЖ -->
   <div id="screen-garage" class="screen">
     <div class="menu-header">
-      <div class="game-title" style="font-size:26px;">ГАРАЖ RC</div>
-      <div class="game-subtitle">Оберіть свій болід</div>
+      <div class="game-title" style="font-size:24px;">ГАРАЖ RC</div>
+      <div class="game-subtitle">Оберіть болід для перегонів</div>
     </div>
     <div class="menu-content">
       <div class="card-selector">
@@ -113,58 +113,22 @@
         <div class="card-desc" id="car-stats">Тип: Багі • Швидкість: 8/10 • Кермо: 9/10</div>
       </div>
       <div style="display:flex; gap:10px;">
-        <button class="btn-action btn-secondary" style="flex:1;" onclick="prevCar()">◀ Попередня</button>
-        <button class="btn-action btn-secondary" style="flex:1;" onclick="nextCar()">Наступна ▶</button>
+        <button class="btn-action btn-secondary" style="flex:1;" onclick="prevCar()">◀</button>
+        <button class="btn-action btn-secondary" style="flex:1;" onclick="nextCar()">▶</button>
       </div>
-      <button class="btn-action" onclick="showScreen('screen-track')">Обрати цю машину ➔</button>
+      <button class="btn-action" onclick="startRace()">Старт гонки! 🚦</button>
       <button class="btn-action btn-secondary" onclick="showScreen('screen-main')">Назад</button>
     </div>
     <div></div>
   </div>
 
-  <!-- ВИБІР ТРАСИ -->
-  <div id="screen-track" class="screen">
-    <div class="menu-header">
-      <div class="game-title" style="font-size:26px;">ВИБІР ТРАСИ</div>
-      <div class="game-subtitle">Локація перегонів</div>
-    </div>
-    <div class="menu-content">
-      <div class="card-selector">
-        <div class="card-title" id="track-name">ВЕЛИКА СПАЛЬНЯ</div>
-        <div class="card-desc" id="track-desc">Траса зі швидкісним трампліном через банки коли та захисними бортами.</div>
-      </div>
-      <div style="display:flex; gap:10px;">
-        <button class="btn-action btn-secondary" style="flex:1;" onclick="prevTrack()">◀</button>
-        <button class="btn-action btn-secondary" style="flex:1;" onclick="nextTrack()">▶</button>
-      </div>
-      <button class="btn-action" onclick="startRace()">Старт гонки! 🚦</button>
-      <button class="btn-action btn-secondary" onclick="showScreen('screen-garage')">Назад</button>
-    </div>
-    <div></div>
-  </div>
-
-  <!-- МУЛЬТИПЛЕЄР -->
-  <div id="screen-multi" class="screen">
-    <div class="menu-header">
-      <div class="game-title" style="font-size:24px;">ОНЛАЙН ЛОБІ</div>
-      <div class="game-subtitle">P2P з'єднання без серверів</div>
-    </div>
-    <div class="menu-content">
-      <button class="btn-action" onclick="alert('Створення кімнати буде активне у Фазі 4 після фіналізації моделі траси!')">👑 Створити кімнату</button>
-      <input type="text" placeholder="Введіть код друга" style="padding:14px; border-radius:12px; border:1px solid #444; background:#1b2230; color:#fff; text-align:center; font-size:16px;">
-      <button class="btn-action btn-secondary" onclick="alert('Введіть коректний код кімнати')">🚀 Приєднатися</button>
-      <button class="btn-action btn-secondary" onclick="showScreen('screen-main')">Назад до меню</button>
-    </div>
-    <div></div>
-  </div>
-
-  <!-- ІГРОВИЙ ІНТЕРФЕЙС (HUD) -->
+  <!-- ІГРОВИЙ HUD -->
   <div id="hud">
     <div class="hud-chip">🏎️ <span id="hud-spd">0</span> км/год · Коло <span id="hud-lap">1</span>/3</div>
     <div class="hud-chip hud-interactive" style="background:#d63031; cursor:pointer;" onclick="exitToMenu()">✕ Меню</div>
   </div>
 
-  <!-- СЕНСОРНЕ КЕРУВАННЯ В ГОНЦІ -->
+  <!-- КЕРУВАННЯ -->
   <div id="touch-controls">
     <div class="control-col">
       <button class="t-btn" id="b-left">◀</button>
@@ -178,32 +142,24 @@
     </div>
   </div>
 
-  <!-- Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <script>
-    // --- МЕНЕДЖМЕНТ СТАНІВ ГРИ ---
+    // --- ДАНІ МАШИН ---
     const CARS = [
-      { id: 0, name: 'RC BANDIT', color: 0xe67e22, stats: 'Тип: Багі • Швидкість: 8/10 • Кермо: 9/10', spd: 32, acc: 26 },
-      { id: 1, name: 'COL. MOSS', color: 0x27ae60, stats: 'Тип: Монстр • Швидкість: 7/10 • Кермо: 7/10', spd: 28, acc: 32 },
-      { id: 2, name: 'TOYECA RC', color: 0x2980b9, stats: 'Тип: Спорт • Швидкість: 10/10 • Кермо: 8/10', spd: 36, acc: 24 }
-    ];
-
-    const TRACKS = [
-      { id: 0, name: 'СПАЛЬНЯ: ТРАМПЛІН', desc: 'Класичний трек з підйомом та стрибком через банки коли.' },
-      { id: 1, name: 'КУХНЯ: ШВИДКІСТЬ', desc: 'Широкі радіуси поворотів і максимальні швидкості.' }
+      { id: 0, name: 'RC BANDIT', color: 0xe67e22, stats: 'Тип: Багі • Баланс швидкості та зчеплення', spd: 32, acc: 26, steer: 3.3 },
+      { id: 1, name: 'COL. MOSS', color: 0x27ae60, stats: 'Тип: Монстр-трак • Висока підвіска, таранна міць', spd: 28, acc: 32, steer: 2.8 },
+      { id: 2, name: 'TOYECA RC', color: 0x0984e3, stats: 'Тип: Спорткар • Найвища швидкість, дрифт', spd: 36, acc: 24, steer: 3.5 }
     ];
 
     let selectedCarIdx = 0;
-    let selectedTrackIdx = 0;
     let inRace = false;
 
-    function showScreen(screenId) {
+    function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-      const sc = document.getElementById(screenId);
+      const sc = document.getElementById(id);
       if (sc) sc.classList.add('active-screen');
     }
-
     function updateGarageUI() {
       const c = CARS[selectedCarIdx];
       document.getElementById('car-name').textContent = c.name;
@@ -212,130 +168,238 @@
     function prevCar() { selectedCarIdx = (selectedCarIdx - 1 + CARS.length) % CARS.length; updateGarageUI(); }
     function nextCar() { selectedCarIdx = (selectedCarIdx + 1) % CARS.length; updateGarageUI(); }
 
-    function updateTrackUI() {
-      const t = TRACKS[selectedTrackIdx];
-      document.getElementById('track-name').textContent = t.name;
-      document.getElementById('track-desc').textContent = t.desc;
-    }
-    function prevTrack() { selectedTrackIdx = (selectedTrackIdx - 1 + TRACKS.length) % TRACKS.length; updateTrackUI(); }
-    function nextTrack() { selectedTrackIdx = (selectedTrackIdx + 1) % TRACKS.length; updateTrackUI(); }
-
-    // --- 3D СВІТ ТА РЕНДЕРЕР ---
+    // --- 3D СЦЕНА ТА ОСВІТЛЕННЯ КІМНАТ ---
     const S = new THREE.Scene();
-    S.background = new THREE.Color(0x3a506b);
-    S.fog = new THREE.Fog(0x3a506b, 80, 320);
+    S.background = new THREE.Color(0x1a2130);
+    S.fog = new THREE.Fog(0x1a2130, 90, 320);
 
     const C = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 500);
     const R = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     R.setSize(innerWidth, innerHeight);
     R.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    R.toneMapping = THREE.ACESFilmicToneMapping;
+    R.toneMappingExposure = 1.3;
     document.body.appendChild(R.domElement);
 
-    S.add(new THREE.AmbientLight(0xffeedd, 1.2));
-    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
-    sun.position.set(50, 90, 40);
-    S.add(sun);
+    // Затишне домашнє освітлення (люстри та сонце з вікон)
+    S.add(new THREE.AmbientLight(0xffeedb, 1.1));
+    const sunLight = new THREE.DirectionalLight(0xfffae8, 1.2);
+    sunLight.position.set(60, 90, 50);
+    S.add(sunLight);
 
-    // Підлога кімнати
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshLambertMaterial({ color: 0x8a6847 }));
-    floor.rotation.x = -Math.PI / 2;
-    S.add(floor);
-
-    // Траса з чіткими бортами
-    const trackGroup = new THREE.Group();
-    S.add(trackGroup);
-    const asphaltMat = new THREE.MeshLambertMaterial({ color: 0x222629 });
-    const curbR = new THREE.MeshLambertMaterial({ color: 0xe74c3c });
-    const curbW = new THREE.MeshLambertMaterial({ color: 0xecf0f1 });
-
-    function addRoad(x, z, w, d) {
-      const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.2, d), asphaltMat);
-      m.position.set(x, 0.1, z);
-      trackGroup.add(m);
-    }
-    addRoad(60, 0, 22, 160);
-    addRoad(-60, 0, 22, 160);
-    addRoad(0, 80, 140, 22);
-    addRoad(0, -80, 140, 22);
-
-    // Трамплін
-    const ramp = new THREE.Mesh(new THREE.BoxGeometry(22, 0.4, 18), new THREE.MeshLambertMaterial({ color: 0x2980b9 }));
-    ramp.rotation.x = 0.22; ramp.position.set(60, 1.8, -5);
-    trackGroup.add(ramp);
-
-    // Банки коли під трампліном
-    for (let bx of [54, 60, 66]) {
-      const can = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, 7, 16), new THREE.MeshPhongMaterial({ color: 0xc0392b }));
-      can.position.set(bx, 3.5, 9);
-      trackGroup.add(can);
-    }
-
-    // Бортики
-    function addCurbWalls(x, z, w, d) {
-      const isW = w > d;
-      const count = Math.floor((isW ? w : d) / 4);
-      for (let i = 0; i < count; i++) {
-        const mat = i % 2 === 0 ? curbR : curbW;
-        const b = new THREE.Mesh(new THREE.BoxGeometry(isW ? 4 : 0.8, 1.4, isW ? 0.8 : 4), mat);
-        if (isW) b.position.set(x - w / 2 + i * 4 + 2, 0.7, z);
-        else b.position.set(x, 0.7, z - d / 2 + i * 4 + 2);
-        trackGroup.add(b);
+    // --- ПРОЦЕДУРНІ ТЕКСТУРИ ПІДЛОГИ ДЛЯ КОЖНОЇ КІМНАТИ ---
+    function makeTileTexture(c1, c2, size) {
+      const cv = document.createElement('canvas'); cv.width = 256; cv.height = 256;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = c1; ctx.fillRect(0,0,256,256);
+      ctx.fillStyle = c2;
+      for (let x=0; x<256; x+=size*2) {
+        for (let y=0; y<256; y+=size*2) {
+          ctx.fillRect(x, y, size, size);
+          ctx.fillRect(x+size, y+size, size, size);
+        }
       }
+      const t = new THREE.CanvasTexture(cv);
+      t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(12, 12);
+      return t;
     }
-    addCurbWalls(71, 0, 0.8, 182);
-    addCurbWalls(-71, 0, 0.8, 182);
-    addCurbWalls(0, 91, 142, 0.8);
-    addCurbWalls(0, -91, 142, 0.8);
-    addCurbWalls(49, 0, 0.8, 138);
-    addCurbWalls(-49, 0, 0.8, 138);
-    addCurbWalls(0, 69, 98, 0.8);
-    addCurbWalls(0, -69, 98, 0.8);
 
-    // Болід гравця
-    let carRoot = new THREE.Group();
-    S.add(carRoot);
+    function makeWoodTexture() {
+      const cv = document.createElement('canvas'); cv.width = 512; cv.height = 512;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#8e5b34'; ctx.fillRect(0,0,512,512);
+      ctx.fillStyle = '#a0683c';
+      for (let y=0; y<512; y+=64) ctx.fillRect(0, y, 512, 30);
+      ctx.strokeStyle = '#5c381e'; ctx.lineWidth = 3;
+      for (let y=0; y<=512; y+=32) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(512,y); ctx.stroke(); }
+      const t = new THREE.CanvasTexture(cv);
+      t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(10, 10);
+      return t;
+    }
 
-    function buildPlayerCarMesh(colorHex) {
-      while (carRoot.children.length > 0) carRoot.remove(carRoot.children[0]);
+    // Підлога різних кімнат
+    const houseGroup = new THREE.Group();
+    S.add(houseGroup);
 
-      const shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 4.8), new THREE.MeshBasicMaterial({ color: 0x101520, transparent: true, opacity: 0.6 }));
+    const parquetMat = new THREE.MeshLambertMaterial({ map: makeWoodTexture() });
+    const tileMat = new THREE.MeshLambertMaterial({ map: makeTileTexture('#f5f6fa', '#2f3640', 32) });
+    const carpetMat = new THREE.MeshLambertMaterial({ color: 0x3867d6 });
+    const kidsMat = new THREE.MeshLambertMaterial({ color: 0xf7b731 });
+
+    // 4 великі кімнати (розмір будинку 160 x 160)
+    function addFloor(x, z, w, d, mat) {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), mat);
+      m.rotation.x = -Math.PI / 2;
+      m.position.set(x, 0.02, z);
+      houseGroup.add(m);
+    }
+    addFloor(-40, 40, 80, 80, parquetMat);  // 1. ВІТАЛЬНЯ (Living Room)
+    addFloor(40, 40, 80, 80, tileMat);     // 2. КУХНЯ (Kitchen)
+    addFloor(40, -40, 80, 80, kidsMat);    // 3. КАБІНЕТ / ДИТЯЧА (Playroom)
+    addFloor(-40, -40, 80, 80, carpetMat); // 4. СПАЛЬНЯ (Bedroom)
+
+    // Масив твердих тіл (стіни та меблі, крізь які не можна проїхати)
+    const solidColliders = [];
+
+    function addSolidBox(x, y, z, w, h, d, color, matType = 'lambert') {
+      const mat = matType === 'phong' 
+        ? new THREE.MeshPhongMaterial({ color, shininess: 40 })
+        : new THREE.MeshLambertMaterial({ color });
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+      m.position.set(x, y + h / 2, z);
+      houseGroup.add(m);
+      solidColliders.push({ x, z, hw: w / 2, hd: d / 2 });
+      return m;
+    }
+
+    // --- СТІНИ БУДИНКУ З ДВЕРНИМИ ПРОЙОМАМИ ---
+    const wallColor = 0xdcdde1;
+    const wallH = 14;
+
+    // Зовнішні глухі стіни (периметр будинку)
+    addSolidBox(0, 0, -80, 162, wallH, 2, wallColor);
+    addSolidBox(0, 0, 80, 162, wallH, 2, wallColor);
+    addSolidBox(-80, 0, 0, 2, wallH, 162, wallColor);
+    addSolidBox(80, 0, 0, 2, wallH, 162, wallColor);
+
+    // ВНУТРІШНІ СТІНИ З ДВЕРИМА:
+    // Горизонтальна стіна (ділить верх і низ): двері ліворуч (x = -40) та праворуч (x = 40)
+    addSolidBox(0, 0, 0, 36, wallH, 2.5, wallColor);        // центральний блок
+    addSolidBox(-68, 0, 0, 24, wallH, 2.5, wallColor);      // ліве крило
+    addSolidBox(68, 0, 0, 24, wallH, 2.5, wallColor);       // праве крило
+    // Проходи між кімнатами: біля x = -40 (двері спальня-вітальня) та x = 40 (кабінет-кухня)
+
+    // Вертикальна стіна (ділить ліворуч і праворуч): двері внизу (z = 40) та вгорі (z = -40)
+    addSolidBox(0, 0, 0, 2.5, wallH, 36, wallColor);        // центральний блок
+    addSolidBox(0, 0, 68, 2.5, wallH, 24, wallColor);       // нижнє крило
+    addSolidBox(0, 0, -68, 2.5, wallH, 24, wallColor);      // верхнє крило
+    // Проходи: біля z = 40 (двері вітальня-кухня) та z = -40 (спальня-кабінет)
+
+    // --- МЕБЛІ ТА ПРЕДМЕТИ В КІМНАТАХ ---
+
+    // 1. ВІТАЛЬНЯ (x: -40, z: 40)
+    // Великий диван
+    addSolidBox(-65, 0, 40, 12, 6, 28, 0x4b6584);
+    // Журнальний столик та килим
+    addSolidBox(-45, 0, 40, 14, 2.5, 14, 0x6d4c41);
+    // Тумба під телевізор біля стіни
+    addSolidBox(-22, 0, 68, 26, 4, 6, 0x2f3542);
+    // Телевізор
+    addSolidBox(-22, 4, 68, 20, 10, 1.5, 0x111111);
+
+    // 2. КУХНЯ (x: 40, z: 40)
+    // Холодильник
+    addSolidBox(70, 0, 68, 12, 18, 12, 0xf1f2f6, 'phong');
+    // Кухонний острів
+    addSolidBox(40, 0, 68, 30, 6, 8, 0x57606f);
+    // ОБІДНІЙ СТІЛ (ніжки тверді, стільниця нагорі — під ним можна мчати на швидкості!)
+    const tableTop = new THREE.Mesh(new THREE.BoxGeometry(26, 1.2, 20), new THREE.MeshLambertMaterial({ color: 0x833471 }));
+    tableTop.position.set(45, 7.5, 30);
+    houseGroup.add(tableTop);
+    // Тверді ніжки столу (як у Re-Volt — slalom!)
+    [[-11, -8], [11, -8], [-11, 8], [11, 8]].forEach(leg => {
+      addSolidBox(45 + leg[0], 0, 30 + leg[1], 1.4, 7.5, 1.4, 0x2c2c54);
+    });
+
+    // 3. КАБІНЕТ / ДИТЯЧА (x: 40, z: -40)
+    // Письмовий стіл
+    addSolidBox(65, 0, -40, 14, 7, 28, 0x3B3B98);
+    // Комп'ютерний монітор
+    addSolidBox(65, 7, -40, 1.5, 6, 10, 0x1e272e);
+    // ТРАМПЛІН: Товста книга-словник, нахилена як рампа
+    const bookRamp = new THREE.Mesh(new THREE.BoxGeometry(16, 1.2, 14), new THREE.MeshLambertMaterial({ color: 0xe74c3c }));
+    bookRamp.rotation.x = -0.25; // підйом угору в бік спальні
+    bookRamp.position.set(38, 1.8, -25);
+    houseGroup.add(bookRamp);
+
+    // 4. СПАЛЬНЯ (x: -40, z: -40)
+    // Велике двоспальне ліжко
+    addSolidBox(-45, 0, -50, 32, 5.5, 26, 0x1289A5);
+    // Подушки
+    addSolidBox(-54, 5.5, -50, 6, 2, 20, 0xffffff);
+    // Шафа для одягу
+    addSolidBox(-70, 0, -25, 8, 16, 20, 0x596275);
+
+    // --- МОДЕЛЬ МАШИНКИ RE-VOLT ---
+    const carGroup = new THREE.Group();
+    S.add(carGroup);
+
+    function buildCarModel(colorHex) {
+      while (carGroup.children.length > 0) carGroup.remove(carGroup.children[0]);
+
+      // Тінь на підлозі
+      const shadow = new THREE.Mesh(
+        new THREE.PlaneGeometry(3.0, 4.8),
+        new THREE.MeshBasicMaterial({ color: 0x05070a, transparent: true, opacity: 0.6 })
+      );
       shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.05;
-      carRoot.add(shadow);
+      carGroup.add(shadow);
 
       const bodyG = new THREE.Group();
-      carRoot.add(bodyG);
+      carGroup.add(bodyG);
 
-      const paint = new THREE.MeshPhongMaterial({ color: colorHex, shininess: 90 });
-      const glass = new THREE.MeshPhongMaterial({ color: 0x111921, shininess: 100 });
+      const paint = new THREE.MeshPhongMaterial({ color: colorHex, shininess: 95 });
+      const glass = new THREE.MeshPhongMaterial({ color: 0x0d131a, shininess: 100 });
       const chrome = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.1 });
+      const tireMat = new THREE.MeshLambertMaterial({ color: 0x151515 });
 
+      // Ніс багі
       const nose = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 1.0, 1.8, 4), paint);
-      nose.rotation.y = Math.PI / 4; nose.rotation.x = Math.PI / 2; nose.position.set(0, 0.48, 1.4);
+      nose.rotation.y = Math.PI / 4; nose.rotation.x = Math.PI / 2; nose.position.set(0, 0.48, 1.3);
       bodyG.add(nose);
 
+      // Кузов
       const chassis = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.5, 2.6), paint);
       chassis.position.set(0, 0.55, -0.4); bodyG.add(chassis);
 
-      const cockpit = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.45, 1.5), glass);
-      cockpit.position.set(0, 0.92, -0.3); bodyG.add(cockpit);
+      // Скляна кабіна
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.45, 1.5), glass);
+      cabin.position.set(0, 0.92, -0.3); bodyG.add(cabin);
 
+      // Спойлер
       const wing = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.08, 0.7), paint);
       wing.position.set(0, 1.35, -1.7); bodyG.add(wing);
 
+      // Антена
       const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 2.6), chrome);
       ant.position.set(0, 1.8, -1.2); bodyG.add(ant);
 
+      // Фари (справжні світлові промені!)
+      for (let fx of [-0.65, 0.65]) {
+        const lightMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.15, 0.1), new THREE.MeshBasicMaterial({ color: 0xfffa65 }));
+        lightMesh.position.set(fx, 0.5, 2.1); bodyG.add(lightMesh);
+      }
+      const carHeadlight = new THREE.SpotLight(0xfffa65, 2.5, 45, Math.PI / 6, 0.5);
+      carHeadlight.position.set(0, 0.6, 1.8);
+      const lightTarget = new THREE.Object3D();
+      lightTarget.position.set(0, 0.6, 15);
+      bodyG.add(lightTarget);
+      carHeadlight.target = lightTarget;
+      bodyG.add(carHeadlight);
+
       // Колеса
       [[-1.25, 1.2], [1.25, 1.2], [-1.35, -1.2], [1.35, -1.2]].forEach(pos => {
-        const w = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 0.45, 16), new THREE.MeshLambertMaterial({ color: 0x151515 }));
+        const w = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 0.45, 16), tireMat);
         w.rotation.z = Math.PI / 2; w.position.set(pos[0], 0.46, pos[1]);
-        carRoot.add(w);
+        carGroup.add(w);
       });
     }
 
-    // --- КЕРУВАННЯ ТА ФІЗИКА ---
-    let px = 60, py = 0, pz = -50, pvx = 0, pvy = 0, pvz = 0, pa = 0, speed = 0;
-    let lap = 1, checkHalf = false;
+    // --- ЧЕКПОЇНТИ (МАРШРУТ ЧЕРЕЗ ВСІ КІМНАТИ БУДИНКУ) ---
+    const checkpoints = [
+      { x: -40, z: 20, desc: 'Вітальня (Старт)' },
+      { x: 0,   z: 40, desc: 'Двері на кухню' },
+      { x: 45,  z: 30, desc: 'Кухня (Під столом)' },
+      { x: 40,  z: 0,  desc: 'Двері в дитячу' },
+      { x: 38,  z: -25, desc: 'Книга-трамплін' },
+      { x: 0,   z: -40, desc: 'Двері в спальню' },
+      { x: -40, z: -20, desc: 'Спальня біля ліжка' },
+      { x: -40, z: 0,   desc: 'Двері назад у вітальню' }
+    ];
+
+    // Фізичні змінні машинки
+    let px = -40, py = 0, pz = 20, pvx = 0, pvy = 0, pvz = 0, pa = Math.PI / 2, speed = 0;
+    let currentCp = 0, lap = 1;
     const I = { l: 0, r: 0, g: 0, b: 0 };
 
     function bind(id, k) {
@@ -346,15 +410,19 @@
       e.addEventListener('touchcancel', ev => { ev.preventDefault(); I[k] = 0; }, { passive: false });
     }
     bind('b-left', 'l'); bind('b-right', 'r'); bind('b-up', 'g'); bind('b-down', 'b');
-    document.getElementById('b-rst').onclick = () => { px = 60; pz = -40; pa = 0; speed = 0; };
+
+    document.getElementById('b-rst').onclick = () => {
+      const cp = checkpoints[currentCp];
+      px = cp.x; pz = cp.z; py = 0.5; speed = 0;
+    };
 
     function startRace() {
       inRace = true;
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
       document.getElementById('hud').style.display = 'flex';
       document.getElementById('touch-controls').style.display = 'flex';
-      buildPlayerCarMesh(CARS[selectedCarIdx].color);
-      px = 60; py = 0; pz = -50; pa = 0; speed = 0; lap = 1;
+      buildCarModel(CARS[selectedCarIdx].color);
+      px = -40; py = 0; pz = 20; pa = Math.PI / 2; speed = 0; lap = 1; currentCp = 0;
     }
 
     function exitToMenu() {
@@ -364,17 +432,32 @@
       showScreen('screen-main');
     }
 
-    // Колізії з бортиками
-    function resolveCollisions() {
-      const r = 1.4;
-      if (px > 71 - r) { px = 71 - r; speed *= -0.3; }
-      if (px < -71 + r) { px = -71 + r; speed *= -0.3; }
-      if (pz > 91 - r) { pz = 91 - r; speed *= -0.3; }
-      if (pz < -91 + r) { pz = -91 + r; speed *= -0.3; }
-      if (px > -49 - r && px < 49 + r && pz > -69 - r && pz < 69 + r) {
-        speed *= -0.3;
-        if (Math.abs(px) > Math.abs(pz)) px = Math.sign(px) * (49 + r);
-        else pz = Math.sign(pz) * (69 + r);
+    // --- НАДІЙНА ФІЗИКА ЗІТКНЕННЯ ЗІ СТІНАМИ ТА МЕБЛЯМИ ---
+    function resolveHouseCollisions() {
+      const carRadius = 1.35;
+
+      for (let box of solidColliders) {
+        // Знаходимо найближчу точку прямокутника до центру машинки
+        const cx = Math.max(box.x - box.hw, Math.min(box.x + box.hw, px));
+        const cz = Math.max(box.z - box.hd, Math.min(box.z + box.hd, pz));
+
+        const dx = px - cx;
+        const dz = pz - cz;
+        const distSq = dx * dx + dz * dz;
+
+        if (distSq < carRadius * carRadius) {
+          const dist = Math.sqrt(distSq) || 0.001;
+          const overlap = carRadius - dist;
+
+          // Виштовхуємо машинку з перешкоди
+          px += (dx / dist) * overlap;
+          pz += (dz / dist) * overlap;
+
+          // Пружний відскок і гальмування
+          speed *= -0.35;
+          pvx = (dx / dist) * 8;
+          pvz = (dz / dist) * 8;
+        }
       }
     }
 
@@ -387,51 +470,56 @@
       if (inRace) {
         const carData = CARS[selectedCarIdx];
         if (I.g) speed += carData.acc * dt;
-        if (I.b) speed -= 35 * dt;
+        if (I.b) speed -= 36 * dt;
         speed *= 0.985;
         speed = Math.max(-9, Math.min(carData.spd, speed));
 
         const steer = (I.r ? 1 : 0) - (I.l ? 1 : 0);
-        pa -= steer * 3.2 * dt * (Math.abs(speed) / 14 + 0.25) * (speed >= -0.1 ? 1 : -1);
+        pa -= steer * carData.steer * dt * (Math.abs(speed) / 14 + 0.25) * (speed >= -0.1 ? 1 : -1);
 
         pvx += (Math.sin(pa) * speed - pvx) * 9 * dt;
         pvz += (Math.cos(pa) * speed - pvz) * 9 * dt;
         px += pvx * dt;
         pz += pvz * dt;
 
-        resolveCollisions();
+        // Перевірка зіткнень зі стінами та меблями
+        resolveHouseCollisions();
 
-        // Трамплін та політ
-        if (Math.abs(px - 60) < 10 && pz > -14 && pz < 4) {
-          py = Math.max(0, (pz - (-14)) * 0.22);
-        } else if (Math.abs(px - 60) < 10 && pz >= 4 && pz < 18 && speed > 15) {
-          pvy = speed * 0.35;
+        // Стрибок на книзі-трампліні в дитячій
+        if (Math.abs(px - 38) < 8 && Math.abs(pz - (-25)) < 7) {
+          py = Math.max(0, (-25 - pz) * 0.3);
+          if (speed > 16 && pz < -28) {
+            pvy = speed * 0.3; // підкидання в повітря
+          }
         }
         if (py > 0 || pvy > 0) {
           pvy -= 38 * dt; py += pvy * dt;
           if (py <= 0) { py = 0; pvy = 0; }
         }
 
-        carRoot.position.set(px, py + 0.05, pz);
-        carRoot.rotation.y = pa;
+        carGroup.position.set(px, py + 0.05, pz);
+        carGroup.rotation.y = pa;
 
-        // Кола
-        if (px < -40 && pz > 0) checkHalf = true;
-        if (checkHalf && px > 40 && pz < -30) {
-          checkHalf = false;
-          lap++;
-          if (lap > 3) lap = 3;
+        // Перевірка чекпоїнтів
+        const target = checkpoints[currentCp];
+        if (Math.hypot(px - target.x, pz - target.z) < 12) {
+          currentCp = (currentCp + 1) % checkpoints.length;
+          if (currentCp === 0) {
+            lap++;
+            if (lap > 3) lap = 3;
+          }
         }
 
         document.getElementById('hud-spd').textContent = Math.round(Math.abs(speed) * 7.5);
         document.getElementById('hud-lap').textContent = lap;
 
-        C.position.lerp(new THREE.Vector3(px - Math.sin(pa) * 10, py + 5.2, pz - Math.cos(pa) * 10), 0.15);
-        C.lookAt(px, py + 1.1, pz);
+        // Камера слідує за машинкою
+        C.position.lerp(new THREE.Vector3(px - Math.sin(pa) * 11, py + 5.5, pz - Math.cos(pa) * 11), 0.15);
+        C.lookAt(px, py + 1.2, pz);
       } else {
-        // Обертання камери над треком у головному меню
-        const t = now * 0.0003;
-        C.position.set(Math.sin(t) * 90, 45, Math.cos(t) * 90);
+        // Огляд будинку в головному меню
+        const t = now * 0.00025;
+        C.position.set(Math.sin(t) * 95, 65, Math.cos(t) * 95);
         C.lookAt(0, 0, 0);
       }
 
