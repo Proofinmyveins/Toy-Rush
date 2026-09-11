@@ -25,8 +25,8 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 100% !important;
-      height: 100% !important;
+      width: 100%;
+      height: 100%;
       z-index: 1;
       display: block;
     }
@@ -35,37 +35,35 @@
       top: env(safe-area-inset-top, 14px);
       left: 14px;
       color: #fff;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 10px 14px;
-      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.75);
+      padding: 8px 14px;
+      border-radius: 12px;
       font-size: 14px;
       font-weight: 700;
       z-index: 10;
       display: flex;
-      gap: 12px;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      gap: 10px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
     #powerup-slot {
       position: fixed;
       top: env(safe-area-inset-top, 14px);
       right: 14px;
-      width: 50px;
-      height: 50px;
-      background: rgba(0, 0, 0, 0.7);
+      width: 46px;
+      height: 46px;
+      background: rgba(0, 0, 0, 0.75);
       border: 2px solid #ffca28;
-      border-radius: 14px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 22px;
       z-index: 10;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
     }
     #c {
       position: fixed;
-      bottom: calc(env(safe-area-inset-bottom, 16px) + 10px);
+      bottom: calc(env(safe-area-inset-bottom, 16px) + 12px);
       left: 0;
       right: 0;
       display: flex;
@@ -81,19 +79,17 @@
       pointer-events: auto;
     }
     button {
-      width: 66px;
-      height: 66px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
       border: 2px solid rgba(255, 255, 255, 0.4);
-      background: rgba(20, 20, 25, 0.75);
+      background: rgba(25, 25, 30, 0.8);
       color: #fff;
       font-size: 24px;
       font-weight: bold;
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
       outline: none;
     }
     button:active {
@@ -109,11 +105,27 @@
       width: 48px;
       height: 48px;
       font-size: 18px;
-      background: rgba(180, 40, 40, 0.8);
+      background: rgba(180, 40, 40, 0.85);
+    }
+    #err-box {
+      position: fixed;
+      top: 65px;
+      left: 10px;
+      right: 10px;
+      background: #d32f2f;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      z-index: 100;
+      display: none;
+      word-break: break-all;
     }
   </style>
 </head>
 <body>
+  <div id="err-box"></div>
+
   <div id="hud">
     <span>🏎️ <span id="s">0</span> км/год</span>
     <span>🏁 Коло <span id="l">1</span>/3</span>
@@ -135,70 +147,63 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
+    // Діагностика помилок на мобільному
+    window.onerror = function(msg, url, line) {
+      const b = document.getElementById('err-box');
+      if (b) {
+        b.style.display = 'block';
+        b.textContent = 'Помилка: ' + msg + ' (рядок ' + line + ')';
+      }
+    };
+
     const S = new THREE.Scene();
     S.background = new THREE.Color(0x9ec6df);
     S.fog = new THREE.Fog(0x9ec6df, 40, 160);
 
-    const C = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 300);
-    C.position.set(0, 5, -19.5);
-    C.lookAt(0, 0.9, -28);
+    const C = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 250);
+    C.position.set(0, 4.8, -19.5);
+    C.lookAt(0, 0.8, -28);
 
-    const R = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    const R = new THREE.WebGLRenderer({ antialias: false });
     R.setSize(window.innerWidth, window.innerHeight);
     R.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    R.shadowMap.enabled = true;
-    R.shadowMap.type = THREE.PCFShadowMap;
     document.body.appendChild(R.domElement);
 
-    S.add(new THREE.AmbientLight(0xffffff, 1.2));
-    const dl = new THREE.DirectionalLight(0xffffff, 1.8);
-    dl.position.set(30, 45, 15);
-    dl.castShadow = true;
-    dl.shadow.mapSize.width = 1024;
-    dl.shadow.mapSize.height = 1024;
-    dl.shadow.camera.near = 10;
-    dl.shadow.camera.far = 140;
-    dl.shadow.camera.left = -55;
-    dl.shadow.camera.right = 55;
-    dl.shadow.camera.top = 55;
-    dl.shadow.camera.bottom = -55;
+    // Освітлення для мобільних без навантаження на батарею
+    S.add(new THREE.AmbientLight(0xffffff, 0.9));
+    const dl = new THREE.DirectionalLight(0xffffff, 0.8);
+    dl.position.set(25, 40, 20);
     S.add(dl);
 
-    // Підлога
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(180, 180),
-      new THREE.MeshStandardMaterial({ color: 0xb59d79, roughness: 0.8 })
-    );
+    // Підлога кімнати
+    const floorMat = new THREE.MeshLambertMaterial({ color: 0xba9e7b });
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(180, 180), floorMat);
     floor.rotation.x = -Math.PI / 2;
-    floor.receiveShadow = true;
     S.add(floor);
 
     function box(x, z, w, d, h, col) {
       const m = new THREE.Mesh(
         new THREE.BoxGeometry(w, h, d),
-        new THREE.MeshStandardMaterial({ color: col, roughness: 0.6 })
+        new THREE.MeshLambertMaterial({ color: col })
       );
       m.position.set(x, h / 2, z);
-      m.castShadow = true;
-      m.receiveShadow = true;
       S.add(m);
       return m;
     }
 
     // Стіни
-    box(0, -44, 92, 3, 5, 0x4e3629);
-    box(0, 44, 92, 3, 5, 0x4e3629);
-    box(-44, 0, 3, 92, 5, 0x4e3629);
-    box(44, 0, 3, 92, 5, 0x4e3629);
+    box(0, -44, 92, 3, 5, 0x5a3d28);
+    box(0, 44, 92, 3, 5, 0x5a3d28);
+    box(-44, 0, 3, 92, 5, 0x5a3d28);
+    box(44, 0, 3, 92, 5, 0x5a3d28);
 
     // Траса
-    const rm = new THREE.MeshStandardMaterial({ color: 0x383838, roughness: 0.9 });
+    const roadMat = new THREE.MeshLambertMaterial({ color: 0x333333 });
     function road(x, z, w, d) {
-      const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.08, d), rm);
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.08, d), roadMat);
       m.position.set(x, 0.04, z);
-      m.receiveShadow = true;
       S.add(m);
     }
     road(0, -28, 70, 11);
@@ -206,13 +211,13 @@
     road(0, 28, 70, 11);
     road(-28, 0, 11, 56);
 
-    // Меблі
+    // Меблі-перешкоди
     box(-22, -17, 14, 8, 5, 0x6d4c41);
     box(22, 16, 12, 7, 5, 0x5d4037);
     box(-22, 23, 8, 10, 4, 0x795548);
     box(23, -23, 10, 6, 4, 0x4e342e);
 
-    // Створення машинки
+    // Створення радіокерованої машинки
     function createCar(col) {
       const root = new THREE.Group();
       const bodyGroup = new THREE.Group();
@@ -220,28 +225,26 @@
 
       const body = new THREE.Mesh(
         new THREE.BoxGeometry(2.3, 0.65, 4),
-        new THREE.MeshStandardMaterial({ color: col, metalness: 0.2, roughness: 0.4 })
+        new THREE.MeshPhongMaterial({ color: col, shininess: 30 })
       );
       body.position.y = 0.65;
-      body.castShadow = true;
       bodyGroup.add(body);
 
       const cabin = new THREE.Mesh(
         new THREE.BoxGeometry(1.5, 0.6, 1.7),
-        new THREE.MeshStandardMaterial({ color: 0x212121, roughness: 0.3 })
+        new THREE.MeshPhongMaterial({ color: 0x222222, shininess: 80 })
       );
       cabin.position.set(0, 1.1, 0.1);
-      cabin.castShadow = true;
       bodyGroup.add(cabin);
 
       const antennaPole = new THREE.Mesh(
         new THREE.CylinderGeometry(0.02, 0.02, 2.2),
-        new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.8 })
+        new THREE.MeshBasicMaterial({ color: 0xdddddd })
       );
       antennaPole.position.y = 1.1;
       const antennaTip = new THREE.Mesh(
-        new THREE.SphereGeometry(0.09, 8, 8),
-        new THREE.MeshStandardMaterial({ color: 0xff1744 })
+        new THREE.SphereGeometry(0.1, 8, 8),
+        new THREE.MeshBasicMaterial({ color: 0xff1744 })
       );
       antennaTip.position.y = 2.2;
 
@@ -252,15 +255,12 @@
       bodyGroup.add(antenna);
 
       const wheels = [];
+      const wheelMat = new THREE.MeshLambertMaterial({ color: 0x151515 });
       for (let wx of [-1.15, 1.15]) {
         for (let wz of [-1.25, 1.25]) {
-          const w = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.44, 0.44, 0.38, 16),
-            new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 })
-          );
+          const w = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.44, 0.38, 14), wheelMat);
           w.rotation.z = Math.PI / 2;
           w.position.set(wx, 0.44, wz);
-          w.castShadow = true;
           root.add(w);
           wheels.push(w);
         }
@@ -287,16 +287,9 @@
     ];
 
     const pickups = [];
-    const pickupGeo = new THREE.BoxGeometry(1.6, 1.6, 1.6);
-    const pickupMat = new THREE.MeshStandardMaterial({
-      color: 0xffca28,
-      emissive: 0xff6f00,
-      emissiveIntensity: 0.4,
-      roughness: 0.2
-    });
-
+    const pickupMat = new THREE.MeshLambertMaterial({ color: 0xffca28 });
     [[28, 0], [0, 28], [-28, 0]].forEach(p => {
-      const mesh = new THREE.Mesh(pickupGeo, pickupMat);
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.6), pickupMat);
       mesh.position.set(p[0], 1.2, p[1]);
       S.add(mesh);
       pickups.push({ mesh, active: true, respawn: 0 });
@@ -306,12 +299,12 @@
     function bind(id, k) {
       const e = document.getElementById(id);
       if (!e) return;
-      const down = ev => { ev.preventDefault(); I[k] = 1; };
-      const up = ev => { ev.preventDefault(); I[k] = 0; };
-      e.addEventListener('pointerdown', down);
-      e.addEventListener('pointerup', up);
-      e.addEventListener('pointercancel', up);
-      e.addEventListener('pointerleave', up);
+      e.addEventListener('touchstart', ev => { ev.preventDefault(); I[k] = 1; }, { passive: false });
+      e.addEventListener('touchend', ev => { ev.preventDefault(); I[k] = 0; }, { passive: false });
+      e.addEventListener('touchcancel', ev => { ev.preventDefault(); I[k] = 0; }, { passive: false });
+      e.addEventListener('mousedown', () => I[k] = 1);
+      e.addEventListener('mouseup', () => I[k] = 0);
+      e.addEventListener('mouseleave', () => I[k] = 0);
     }
     bind('L', 'l'); bind('R', 'r'); bind('G', 'g'); bind('B', 'b');
 
@@ -323,7 +316,8 @@
       document.getElementById('powerup-slot').textContent = '❓';
       actBtn.style.display = 'none';
     }
-    actBtn.addEventListener('pointerdown', ev => { ev.preventDefault(); usePowerup(); });
+    actBtn.addEventListener('touchstart', ev => { ev.preventDefault(); usePowerup(); }, { passive: false });
+    actBtn.addEventListener('click', usePowerup);
 
     function resetCar() {
       const curPt = pts[Math.floor(pProg) % pts.length];
@@ -331,7 +325,9 @@
       pz = curPt[1];
       pv = 0;
     }
-    document.getElementById('RST').addEventListener('pointerdown', ev => { ev.preventDefault(); resetCar(); });
+    const rstBtn = document.getElementById('RST');
+    rstBtn.addEventListener('touchstart', ev => { ev.preventDefault(); resetCar(); }, { passive: false });
+    rstBtn.addEventListener('click', resetCar);
 
     window.addEventListener('keydown', e => {
       if (e.key === 'ArrowLeft' || e.key === 'a') I.l = 1;
@@ -356,17 +352,17 @@
         let q = ((cx - A[0]) * dx + (cz - A[1]) * dz) / (dx * dx + dz * dz);
         q = Math.max(0, Math.min(1, q));
         let tx = A[0] + dx * q, tz = A[1] + dz * q;
-        let d = (cx - tx) ** 2 + (cz - tz) ** 2;
+        let d = (cx - tx) * (cx - tx) + (cz - tz) * (cz - tz);
         if (d < best) { best = d; o = i + q; }
       }
       return o;
     }
 
-    const clock = new THREE.Clock();
-    function tick() {
+    let lastTime = performance.now();
+    function tick(now) {
       requestAnimationFrame(tick);
-      const dt = Math.min(clock.getDelta(), 0.05);
-      const elapsed = clock.getElapsedTime();
+      const dt = Math.min((now - lastTime) / 1000, 0.05);
+      lastTime = now;
 
       const maxSpeed = boostTimer > 0 ? 42 : 26;
       const accel = boostTimer > 0 ? 35 : 20;
@@ -389,7 +385,7 @@
       player.bodyGroup.rotation.z = -steerInput * 0.12 * (pv / maxSpeed);
       player.bodyGroup.rotation.x = (I.g ? -0.05 : 0) + (I.b ? 0.08 : 0);
       player.antenna.rotation.z = steerInput * 0.35;
-      player.antenna.rotation.x = -(pv / maxSpeed) * 0.45 + Math.sin(elapsed * 12) * 0.05;
+      player.antenna.rotation.x = -(pv / maxSpeed) * 0.45 + Math.sin(now * 0.01) * 0.05;
       player.wheels.forEach(w => w.rotation.x += pv * 0.25);
 
       const q = getProgress(px, pz);
@@ -408,9 +404,10 @@
           }
         } else {
           p.mesh.rotation.y += 2 * dt;
-          p.mesh.position.y = 1.2 + Math.sin(elapsed * 3) * 0.25;
+          p.mesh.position.y = 1.2 + Math.sin(now * 0.003) * 0.25;
 
-          if (Math.hypot(px - p.mesh.position.x, pz - p.mesh.position.z) < 2.3) {
+          const dist = Math.hypot(px - p.mesh.position.x, pz - p.mesh.position.z);
+          if (dist < 2.3) {
             p.active = false;
             p.mesh.visible = false;
             p.respawn = 6;
@@ -439,7 +436,7 @@
 
         ai.car.root.position.set(ai.x, 0.05, ai.z);
         ai.car.root.rotation.y = ai.a;
-        ai.car.antenna.rotation.x = -0.25 + Math.sin(elapsed * 10 + ai.x) * 0.05;
+        ai.car.antenna.rotation.x = -0.25 + Math.sin(now * 0.008 + ai.x) * 0.05;
         ai.car.wheels.forEach(w => w.rotation.x += ai.v * 0.25);
 
         if (Math.hypot(tdx, tdz) < 4.5) {
@@ -468,11 +465,11 @@
         pz - Math.cos(pa) * 8.5
       );
       C.position.lerp(camTarget, 0.12);
-      C.lookAt(px, 0.9, pz);
+      C.lookAt(px, 0.8, pz);
 
       R.render(S, C);
     }
-    tick();
+    tick(performance.now());
 
     window.addEventListener('resize', () => {
       C.aspect = window.innerWidth / window.innerHeight;
