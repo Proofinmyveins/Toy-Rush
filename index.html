@@ -3,60 +3,70 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <title>Toy Rush - Re-Volt Edition</title>
+  <title>Toy Rush 3D - Re-Volt</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
       margin: 0; padding: 0; width: 100%; height: 100%;
-      overflow: hidden; background: #6da4c7; touch-action: none;
+      overflow: hidden; background: #5c8ca8; touch-action: none;
       -webkit-user-select: none; user-select: none;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
     canvas { position: absolute; top: 0; left: 0; width: 100% !important; height: 100% !important; z-index: 1; display: block; }
     #top-bar {
-      position: fixed; top: env(safe-area-inset-top, 12px); left: 12px; right: 12px;
+      position: fixed; top: env(safe-area-inset-top, 10px); left: 10px; right: 10px;
       display: flex; justify-content: space-between; align-items: center; z-index: 10; pointer-events: none;
     }
     #hud {
-      background: rgba(12, 16, 26, 0.88); color: #fff; padding: 8px 14px;
-      border-radius: 12px; font-size: 13px; font-weight: 700; display: flex; gap: 10px;
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(12, 16, 26, 0.9); color: #fff; padding: 7px 12px;
+      border-radius: 12px; font-size: 13px; font-weight: 700; display: flex; gap: 8px;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2);
     }
-    .top-btns { display: flex; gap: 8px; pointer-events: auto; }
+    .top-btns { display: flex; gap: 6px; pointer-events: auto; }
     .ui-btn {
-      height: 42px; padding: 0 14px; background: rgba(12, 16, 26, 0.88);
-      border: 1px solid rgba(255,255,255,0.22); border-radius: 12px; color: #fff;
+      height: 40px; padding: 0 11px; background: rgba(12, 16, 26, 0.9);
+      border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; color: #fff;
       font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center;
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
-    #powerup-slot { width: 42px; font-size: 20px; border-color: #ffca28; }
+    #powerup-slot { width: 40px; font-size: 20px; border-color: #ffca28; }
     #c {
-      position: fixed; bottom: calc(env(safe-area-inset-bottom, 16px) + 10px);
+      position: fixed; bottom: calc(env(safe-area-inset-bottom, 16px) + 8px);
       left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 16px;
       z-index: 10; pointer-events: none;
     }
-    .g { display: flex; gap: 12px; align-items: flex-end; pointer-events: auto; }
+    .g { display: flex; gap: 10px; align-items: flex-end; pointer-events: auto; }
     button {
       width: 66px; height: 66px; border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, 0.4); background: rgba(18, 22, 32, 0.85);
+      border: 2px solid rgba(255, 255, 255, 0.4); background: rgba(20, 24, 35, 0.85);
       color: #fff; font-size: 24px; font-weight: bold; display: flex;
       align-items: center; justify-content: center; outline: none;
     }
-    button:active { background: rgba(255, 255, 255, 0.35); transform: scale(0.94); }
+    button:active { background: rgba(255, 255, 255, 0.4); transform: scale(0.93); }
     #ACT { background: rgba(255, 179, 0, 0.95); border-color: #ffe082; display: none; }
-    #RST { width: 48px; height: 48px; font-size: 18px; background: rgba(190, 35, 35, 0.9); }
-    #track-menu {
-      position: fixed; top: 65px; right: 12px; background: rgba(12, 16, 26, 0.96);
-      padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); display: none;
-      flex-direction: column; gap: 6px; z-index: 20;
+    #RST { width: 46px; height: 46px; font-size: 18px; background: rgba(190, 35, 35, 0.9); }
+    
+    .dropdown {
+      position: fixed; top: 60px; right: 10px; background: rgba(12, 16, 26, 0.96);
+      padding: 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.2); display: none;
+      flex-direction: column; gap: 8px; z-index: 30;
     }
-    #track-menu button {
-      width: 140px; height: 36px; border-radius: 8px; font-size: 12px;
-      background: #252e42; border: none;
+    .dropdown button {
+      width: 155px; height: 38px; border-radius: 10px; font-size: 13px;
+      background: #232b3d; border: 1px solid #ffffff22;
+    }
+    #finish-banner {
+      position: fixed; top: 35%; left: 50%; transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.92); color: #ffd700; border: 3px solid #ffd700;
+      padding: 16px 28px; border-radius: 20px; font-size: 26px; font-weight: 900;
+      text-align: center; z-index: 100; display: none; text-transform: uppercase;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
     }
   </style>
 </head>
 <body>
+  <div id="finish-banner">🏁 ФІНІШ! 🏆<br><span style="font-size:16px;color:#fff;">Всі кола пройдено!</span></div>
+
   <div id="top-bar">
     <div id="hud">
       <span>🏎️ <span id="s">0</span></span>
@@ -65,13 +75,20 @@
     </div>
     <div class="top-btns">
       <div id="powerup-slot" class="ui-btn">❓</div>
-      <div id="map-btn" class="ui-btn">🗺️ Карта</div>
+      <div id="garage-btn" class="ui-btn">🚗 Гараж</div>
+      <div id="map-btn" class="ui-btn">🗺️ Траса</div>
     </div>
   </div>
 
-  <div id="track-menu">
-    <button onclick="loadTrack(0)">🧸 Дитяча кімната</button>
-    <button onclick="loadTrack(1)">⚡ Батарейний спідвей</button>
+  <div id="garage-menu" class="dropdown">
+    <button onclick="selectCar(0)">🏎️ Багі (Bandit)</button>
+    <button onclick="selectCar(1)">🛞 Монстр (Moss)</button>
+    <button onclick="selectCar(2)">⚡ Спорткар (Toyeca)</button>
+  </div>
+
+  <div id="track-menu" class="dropdown">
+    <button onclick="loadTrack(0)">🧸 Велика спальня</button>
+    <button onclick="loadTrack(1)">🍳 Кухня-Гран-прі</button>
   </div>
 
   <div id="c">
@@ -90,341 +107,306 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     const S = new THREE.Scene();
-    S.background = new THREE.Color(0x6da4c7);
-    S.fog = new THREE.Fog(0x6da4c7, 50, 190);
+    S.background = new THREE.Color(0x5c8ca8);
+    S.fog = new THREE.Fog(0x5c8ca8, 70, 260);
 
-    const C = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 350);
+    const C = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 400);
     const R = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     R.setSize(innerWidth, innerHeight);
     R.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    R.toneMapping = THREE.ACESFilmicToneMapping;
+    R.toneMappingExposure = 1.15;
     document.body.appendChild(R.domElement);
 
-    // Світло: затишне кімнатне освітлення
-    S.add(new THREE.AmbientLight(0xfff1e0, 1.15));
-    const mainLight = new THREE.DirectionalLight(0xfffaed, 0.95);
-    mainLight.position.set(35, 60, 25);
-    S.add(mainLight);
+    S.add(new THREE.AmbientLight(0xfff6ec, 1.2));
+    const sun = new THREE.DirectionalLight(0xfffaed, 1.0);
+    sun.position.set(45, 80, 40);
+    S.add(sun);
+    const skyLight = new THREE.DirectionalLight(0x7fb3d5, 0.4);
+    skyLight.position.set(-40, 30, -40);
+    S.add(skyLight);
 
-    // Допоміжне блакитне підсвічування від вікна
-    const fillLight = new THREE.DirectionalLight(0x90b4ce, 0.45);
-    fillLight.position.set(-30, 20, -30);
-    S.add(fillLight);
-
-    // --- ПРОЦЕДУРНІ ТЕКСТУРИ ---
-    function makeParquetTexture() {
+    // --- ПРОЦЕДУРНІ ТЕКСТУРИ ВИСОКОЇ ДЕТАЛІЗАЦІЇ ---
+    function makeRoadTexture() {
       const cv = document.createElement('canvas');
       cv.width = 512; cv.height = 512;
       const ctx = cv.getContext('2d');
-      ctx.fillStyle = '#b7976e';
+      // Зернистий асфальт
+      ctx.fillStyle = '#22252a';
       ctx.fillRect(0, 0, 512, 512);
-      ctx.fillStyle = '#c7a77d';
-      for (let y = 0; y < 512; y += 64) {
-        ctx.fillRect(0, y, 512, 30);
-        ctx.fillStyle = y % 128 === 0 ? '#ad8b62' : '#c29f74';
+      ctx.fillStyle = '#1c1f24';
+      for (let i = 0; i < 4000; i++) {
+        ctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
       }
-      ctx.strokeStyle = '#725637';
-      ctx.lineWidth = 3;
-      for (let y = 0; y <= 512; y += 32) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
-      }
-      for (let y = 0; y < 512; y += 32) {
-        const off = (y / 32) % 2 * 64;
-        for (let x = off; x <= 512; x += 128) {
-          ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 32); ctx.stroke();
-        }
+      // Білі суцільні бічні смуги
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(16, 0, 18, 512);
+      ctx.fillRect(478, 0, 18, 512);
+      // Жовта пунктирна осьова лінія
+      ctx.fillStyle = '#fbc531';
+      for (let y = 16; y < 512; y += 64) {
+        ctx.fillRect(248, y, 16, 36);
       }
       const t = new THREE.CanvasTexture(cv);
       t.wrapS = t.wrapT = THREE.RepeatWrapping;
-      t.repeat.set(12, 12);
       return t;
     }
 
-    // Підлога (паркет)
-    const floorGeo = new THREE.PlaneGeometry(240, 240);
-    const floorMat = new THREE.MeshLambertMaterial({ map: makeParquetTexture() });
-    const floor = new THREE.Mesh(floorGeo, floorMat);
+    function makeFloorTexture(col1, col2, gridSize) {
+      const cv = document.createElement('canvas');
+      cv.width = 256; cv.height = 256;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = col1;
+      ctx.fillRect(0, 0, 256, 256);
+      ctx.fillStyle = col2;
+      for (let y = 0; y < 256; y += gridSize) {
+        ctx.fillRect(0, y, 256, 2);
+        ctx.fillRect(y, 0, 2, 256);
+      }
+      const t = new THREE.CanvasTexture(cv);
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(16, 16);
+      return t;
+    }
+
+    const roadTex = makeRoadTexture();
+    const asphaltMat = new THREE.MeshLambertMaterial({ map: roadTex });
+    const floorMat = new THREE.MeshLambertMaterial({ map: makeFloorTexture('#a38460', '#836544', 32) });
+
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(320, 320), floorMat);
     floor.rotation.x = -Math.PI / 2;
     S.add(floor);
 
-    // Стіни кімнати з дерев'яним плінтусом
-    function buildRoomEnclosure() {
-      const grp = new THREE.Group();
-      const wallMat = new THREE.MeshLambertMaterial({ color: 0xdfd3be });
-      const skirtingMat = new THREE.MeshLambertMaterial({ color: 0x4a3424 });
-
-      const addWall = (x, z, w, d) => {
-        const wMesh = new THREE.Mesh(new THREE.BoxGeometry(w, 10, d), wallMat);
-        wMesh.position.set(x, 5, z);
-        grp.add(wMesh);
-        const skMesh = new THREE.Mesh(new THREE.BoxGeometry(w + 0.2, 1.2, d + 0.2), skirtingMat);
-        skMesh.position.set(x, 0.6, z);
-        grp.add(skMesh);
+    // Зовнішні стіни кімнати
+    function buildRoom(size) {
+      const g = new THREE.Group();
+      const wMat = new THREE.MeshLambertMaterial({ color: 0xd6cbb8 });
+      const b = (x, z, w, d) => {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(w, 12, d), wMat);
+        m.position.set(x, 6, z);
+        g.add(m);
       };
-      addWall(0, -52, 108, 3);
-      addWall(0, 52, 108, 3);
-      addWall(-52, 0, 3, 108);
-      addWall(52, 0, 3, 108);
-      S.add(grp);
+      b(0, -size, size * 2 + 6, 6);
+      b(0, size, size * 2 + 6, 6);
+      b(-size, 0, 6, size * 2 + 6);
+      b(size, 0, 6, size * 2 + 6);
+      S.add(g);
     }
-    buildRoomEnclosure();
+    buildRoom(90);
 
-    // --- МОДЕЛЬ МАШИНКИ RE-VOLT RC BUGGY ---
-    function createRCBuggy(bodyHex, numberStr) {
+    // --- СИСТЕМА ЧАСТИНОК (ДИМ ТА ПИЛ З-ПІД КОЛІС) ---
+    const particles = [];
+    const pGeo = new THREE.SphereGeometry(0.18, 6, 6);
+    const pMat = new THREE.MeshBasicMaterial({ color: 0xcccccc, transparent: true, opacity: 0.5 });
+    for (let i = 0; i < 30; i++) {
+      const m = new THREE.Mesh(pGeo, pMat.clone());
+      m.visible = false;
+      S.add(m);
+      particles.push({ mesh: m, life: 0 });
+    }
+    function emitSmoke(x, y, z) {
+      const p = particles.find(pt => pt.life <= 0);
+      if (!p) return;
+      p.mesh.position.set(x + (Math.random() - 0.5) * 0.4, y, z + (Math.random() - 0.5) * 0.4);
+      p.mesh.scale.setScalar(1);
+      p.mesh.material.opacity = 0.55;
+      p.mesh.visible = true;
+      p.life = 0.45;
+    }
+
+    // --- МОДЕЛІ МАШИНОК З ГАРАЖА ---
+    const carProfiles = [
+      { name: 'RC-Bandit', color: 0xe84118, type: 'buggy', spd: 31, acc: 25, steer: 3.2, mass: 1.0 },
+      { name: 'Col-Moss', color: 0x2e7d32, type: 'monster', spd: 27, acc: 30, steer: 2.7, mass: 1.6 },
+      { name: 'Toyeca', color: 0x1565c0, type: 'sport', spd: 35, acc: 23, steer: 3.4, mass: 0.9 }
+    ];
+
+    function createVehicle(profile) {
       const root = new THREE.Group();
+      const bodyGroup = new THREE.Group();
+      root.add(bodyGroup);
 
       // Контактна тінь
-      const shadowMat = new THREE.MeshBasicMaterial({ color: 0x14100c, transparent: true, opacity: 0.45 });
-      const shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 4.6), shadowMat);
+      const shadowMat = new THREE.MeshBasicMaterial({ color: 0x101010, transparent: true, opacity: 0.5 });
+      const shadow = new THREE.Mesh(new THREE.PlaneGeometry(profile.type === 'monster' ? 3.8 : 3.0, 4.8), shadowMat);
       shadow.rotation.x = -Math.PI / 2;
       shadow.position.y = 0.05;
       root.add(shadow);
 
-      const bodyGroup = new THREE.Group();
-      root.add(bodyGroup);
+      const mainMat = new THREE.MeshPhongMaterial({ color: profile.color, shininess: 85 });
+      const glassMat = new THREE.MeshPhongMaterial({ color: 0x111c26, shininess: 100 });
+      const chromeMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.8, roughness: 0.2 });
+      const blackMat = new THREE.MeshLambertMaterial({ color: 0x161616 });
 
-      const carMat = new THREE.MeshPhongMaterial({ color: bodyHex, shininess: 85, specular: 0x444444 });
-      const whiteMat = new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 40 });
-      const blackMat = new THREE.MeshLambertMaterial({ color: 0x181818 });
-      const springMat = new THREE.MeshBasicMaterial({ color: 0xffd600 });
-      const chromeMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee, metalness: 0.8, roughness: 0.2 });
+      const wheels = [];
 
-      // Шасі (клиноподібне тіло)
-      const chassis = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.4, 3.6), carMat);
-      chassis.position.y = 0.55;
-      bodyGroup.add(chassis);
+      if (profile.type === 'buggy') {
+        // Багі
+        const b = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.5, 3.6), mainMat);
+        b.position.y = 0.6; bodyGroup.add(b);
+        const c = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.5, 1.8), glassMat);
+        c.position.set(0, 0.98, -0.1); bodyGroup.add(c);
+        const w = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.08, 0.7), mainMat);
+        w.position.set(0, 1.45, -1.6); bodyGroup.add(w);
 
-      // Ніс багі (звуження спереду)
-      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.85, 1.2, 4), carMat);
-      nose.rotation.x = Math.PI / 2;
-      nose.rotation.y = Math.PI / 4;
-      nose.position.set(0, 0.5, 2.1);
-      nose.scale.set(1.4, 1.2, 0.45);
-      bodyGroup.add(nose);
+        [[-1.25, 1.3, 0.42, 0.38], [1.25, 1.3, 0.42, 0.38], [-1.35, -1.3, 0.52, 0.55], [1.35, -1.3, 0.52, 0.55]].forEach(cfg => {
+          const wg = new THREE.Group();
+          const t = new THREE.Mesh(new THREE.CylinderGeometry(cfg[2], cfg[2], cfg[3], 14), blackMat);
+          t.rotation.z = Math.PI / 2;
+          const rim = new THREE.Mesh(new THREE.CylinderGeometry(cfg[2]*0.55, cfg[2]*0.55, cfg[3]+0.02, 8), chromeMat);
+          rim.rotation.z = Math.PI / 2;
+          wg.add(t); wg.add(rim);
+          wg.position.set(cfg[0], cfg[2], cfg[1]);
+          root.add(wg); wheels.push(wg);
+        });
+      } else if (profile.type === 'monster') {
+        // Монстр-трак
+        const b = new THREE.Mesh(new THREE.BoxGeometry(2.3, 1.0, 4.0), mainMat);
+        b.position.y = 1.35; bodyGroup.add(b);
+        const c = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.75, 2.0), glassMat);
+        c.position.set(0, 2.05, 0.1); bodyGroup.add(c);
+        // Захисна решітка
+        const grill = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.5, 0.3), chromeMat);
+        grill.position.set(0, 1.1, 2.1); bodyGroup.add(grill);
 
-      // Кабіна-купол
-      const cockpit = new THREE.Mesh(
-        new THREE.BoxGeometry(1.2, 0.55, 1.7),
-        new THREE.MeshPhongMaterial({ color: 0x111c24, shininess: 100 })
-      );
-      cockpit.position.set(0, 0.95, -0.1);
-      cockpit.rotation.x = 0.12;
-      bodyGroup.add(cockpit);
+        [[-1.6, 1.4, 0.72, 0.7], [1.6, 1.4, 0.72, 0.7], [-1.6, -1.4, 0.72, 0.7], [1.6, -1.4, 0.72, 0.7]].forEach(cfg => {
+          const wg = new THREE.Group();
+          const t = new THREE.Mesh(new THREE.CylinderGeometry(cfg[2], cfg[2], cfg[3], 16), blackMat);
+          t.rotation.z = Math.PI / 2;
+          const rim = new THREE.Mesh(new THREE.CylinderGeometry(cfg[2]*0.5, cfg[2]*0.5, cfg[3]+0.04, 8), mainMat);
+          rim.rotation.z = Math.PI / 2;
+          wg.add(t); wg.add(rim);
+          wg.position.set(cfg[0], cfg[2], cfg[1]);
+          root.add(wg); wheels.push(wg);
+        });
+      } else {
+        // Спорткар Toyeca
+        const b = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.55, 4.2), mainMat);
+        b.position.y = 0.5; bodyGroup.add(b);
+        const c = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.5, 2.1), glassMat);
+        c.position.set(0, 0.9, -0.2); bodyGroup.add(c);
+        const diff = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.15, 0.4), blackMat);
+        diff.position.set(0, 0.35, -2.15); bodyGroup.add(diff);
 
-      // Гоночні білі поздовжні смуги
-      const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.42, 3.4), whiteMat);
-      stripe.position.set(0, 0.56, 0);
-      bodyGroup.add(stripe);
-
-      // Високий спортивний спойлер Re-Volt
-      const wing = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.08, 0.75), carMat);
-      wing.position.set(0, 1.45, -1.7);
-      wing.rotation.x = -0.15;
-      bodyGroup.add(wing);
-
-      for (let sx of [-0.65, 0.65]) {
-        const strut = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.6, 0.25), blackMat);
-        strut.position.set(sx, 1.15, -1.65);
-        bodyGroup.add(strut);
+        [[-1.2, 1.35, 0.44, 0.4], [1.2, 1.35, 0.44, 0.4], [-1.2, -1.35, 0.46, 0.48], [1.2, -1.35, 0.46, 0.48]].forEach(cfg => {
+          const wg = new THREE.Group();
+          const t = new THREE.Mesh(new THREE.CylinderGeometry(cfg[2], cfg[2], cfg[3], 14), blackMat);
+          t.rotation.z = Math.PI / 2;
+          const rim = new THREE.Mesh(new THREE.CylinderGeometry(cfg[2]*0.6, cfg[2]*0.6, cfg[3]+0.02, 8), chromeMat);
+          rim.rotation.z = Math.PI / 2;
+          wg.add(t); wg.add(rim);
+          wg.position.set(cfg[0], cfg[2], cfg[1]);
+          root.add(wg); wheels.push(wg);
+        });
       }
 
-      // Відкриті амортизатори з пружинами
-      const shockPositions = [
-        [-0.95, 0.65, 1.3], [0.95, 0.65, 1.3],
-        [-1.0, 0.75, -1.2], [1.0, 0.75, -1.2]
-      ];
-      shockPositions.forEach(sp => {
-        const shockArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.5, 8), blackMat);
-        shockArm.rotation.z = sp[0] < 0 ? 0.35 : -0.35;
-        shockArm.position.set(sp[0] * 0.7, sp[1], sp[2]);
-        const spring = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.35, 8), springMat);
-        spring.rotation.z = shockArm.rotation.z;
-        spring.position.set(sp[0] * 0.7, sp[1], sp[2]);
-        bodyGroup.add(shockArm);
-        bodyGroup.add(spring);
-      });
-
-      // Передня протипідкатна дуга (іграшковий бампер)
-      const bumper = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.15, 0.3), blackMat);
-      bumper.position.set(0, 0.38, 2.5);
-      bodyGroup.add(bumper);
-
-      // Довга радіоантена з вимпелом
-      const antennaPole = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 2.6, 6), chromeMat);
-      antennaPole.position.y = 1.3;
-      const pennant = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.25, 0.6), new THREE.MeshBasicMaterial({ color: 0xff3d00 }));
-      pennant.position.set(0, 2.45, -0.3);
-
-      const antenna = new THREE.Group();
-      antenna.position.set(0, 1.1, -1.2);
-      antenna.add(antennaPole);
-      antenna.add(pennant);
-      bodyGroup.add(antenna);
-
-      // Широкі задні та швидкі передні колеса
-      const wheels = [];
-      const tireConfigs = [
-        { x: -1.25, z: 1.35, r: 0.42, w: 0.38 }, // передні
-        { x: 1.25, z: 1.35, r: 0.42, w: 0.38 },
-        { x: -1.35, z: -1.3, r: 0.52, w: 0.55 }, // масивні задні
-        { x: 1.35, z: -1.3, r: 0.52, w: 0.55 }
-      ];
-
-      tireConfigs.forEach(tc => {
-        const wGroup = new THREE.Group();
-        const tire = new THREE.Mesh(new THREE.CylinderGeometry(tc.r, tc.r, tc.w, 14), blackMat);
-        tire.rotation.z = Math.PI / 2;
-        tire.position.y = 0;
-        const rim = new THREE.Mesh(new THREE.CylinderGeometry(tc.r * 0.55, tc.r * 0.55, tc.w + 0.02, 8), chromeMat);
-        rim.rotation.z = Math.PI / 2;
-        wGroup.add(tire);
-        wGroup.add(rim);
-        wGroup.position.set(tc.x, tc.r, tc.z);
-        root.add(wGroup);
-        wheels.push(wGroup);
-      });
+      // Антена з червоним наконечником
+      const ant = new THREE.Group();
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 2.6), chromeMat);
+      pole.position.y = 1.3;
+      const tip = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff3300 }));
+      tip.position.y = 2.6;
+      ant.position.set(0, 1.2, -1.3);
+      ant.add(pole); ant.add(tip);
+      bodyGroup.add(ant);
 
       S.add(root);
-      return { root, bodyGroup, antenna, wheels, pennant };
+      return { root, bodyGroup, antenna: ant, wheels, profile };
     }
 
-    // --- ОБ'ЄКТИ КІМНАТИ RE-VOLT ---
-    function createGiantPencil(x, z, len, rotY, colorHex) {
-      const pGroup = new THREE.Group();
-      const woodMat = new THREE.MeshLambertMaterial({ color: 0xe0b988 });
-      const paintMat = new THREE.MeshLambertMaterial({ color: colorHex });
-      const eraserMat = new THREE.MeshLambertMaterial({ color: 0xef798a });
-      const metalMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8 });
-
-      // Шестигранне тіло олівця
-      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, len, 6), paintMat);
-      body.rotation.z = Math.PI / 2;
-      body.position.set(0, 0.9, 0);
-      pGroup.add(body);
-
-      // Заточений дерев'яний носик із графітом
-      const tipWood = new THREE.Mesh(new THREE.ConeGeometry(0.9, 2.2, 6), woodMat);
-      tipWood.rotation.z = -Math.PI / 2;
-      tipWood.position.set(len / 2 + 1.1, 0.9, 0);
-      pGroup.add(tipWood);
-
-      const lead = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.7, 6), new THREE.MeshBasicMaterial({ color: 0x1a1a1a }));
-      lead.rotation.z = -Math.PI / 2;
-      lead.position.set(len / 2 + 1.9, 0.9, 0);
-      pGroup.add(lead);
-
-      // Гумка на кінці
-      const band = new THREE.Mesh(new THREE.CylinderGeometry(0.92, 0.92, 0.8, 12), metalMat);
-      band.rotation.z = Math.PI / 2;
-      band.position.set(-len / 2 - 0.4, 0.9, 0);
-      pGroup.add(band);
-
-      const eraser = new THREE.Mesh(new THREE.CylinderGeometry(0.88, 0.88, 1.2, 12), eraserMat);
-      eraser.rotation.z = Math.PI / 2;
-      eraser.position.set(-len / 2 - 1.3, 0.9, 0);
-      pGroup.add(eraser);
-
-      pGroup.rotation.y = rotY;
-      pGroup.position.set(x, 0, z);
-      return pGroup;
-    }
-
-    function createGiantBattery(x, z, rotY) {
-      const bGroup = new THREE.Group();
-      const bodyMat = new THREE.MeshPhongMaterial({ color: 0x1e272e, shininess: 60 });
-      const goldMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.9, roughness: 0.3 });
-
-      const body = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, 8.5, 20), bodyMat);
-      body.position.y = 4.25;
-      bGroup.add(body);
-
-      const goldTop = new THREE.Mesh(new THREE.CylinderGeometry(2.22, 2.22, 2.2, 20), goldMat);
-      goldTop.position.y = 7.4;
-      bGroup.add(goldTop);
-
-      const plusPin = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.9, 14), goldMat);
-      plusPin.position.y = 9.0;
-      bGroup.add(plusPin);
-
-      bGroup.rotation.y = rotY;
-      bGroup.position.set(x, 0, z);
-      return bGroup;
-    }
-
-    function createCardboardBox(x, z, sx, sy, sz, rotY) {
-      const bGroup = new THREE.Group();
-      const boxMat = new THREE.MeshLambertMaterial({ color: 0xa98256 });
-      const tapeMat = new THREE.MeshLambertMaterial({ color: 0x85613a });
-
-      const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), boxMat);
-      m.position.y = sy / 2;
-      bGroup.add(m);
-
-      const tape = new THREE.Mesh(new THREE.BoxGeometry(sx + 0.05, sy + 0.05, sz * 0.28), tapeMat);
-      tape.position.y = sy / 2;
-      bGroup.add(tape);
-
-      bGroup.rotation.y = rotY;
-      bGroup.position.set(x, 0, z);
-      return bGroup;
-    }
-
-    // Арка старту/фінішу
-    function createGantry(x, z, rotY) {
+    // --- ДЕКОРАЦІЇ КІМНАТИ ---
+    function createPencil(x, z, len, rotY, hex) {
       const g = new THREE.Group();
-      const metal = new THREE.MeshStandardMaterial({ color: 0xdcdde1, metalness: 0.5 });
-      const banner = new THREE.MeshLambertMaterial({ color: 0xe84118 });
+      const b = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, len, 6), new THREE.MeshLambertMaterial({ color: hex }));
+      b.rotation.z = Math.PI / 2; b.position.y = 0.9; g.add(b);
+      const tip = new THREE.Mesh(new THREE.ConeGeometry(0.9, 2.2, 6), new THREE.MeshLambertMaterial({ color: 0xdfba89 }));
+      tip.rotation.z = -Math.PI / 2; tip.position.set(len/2 + 1.1, 0.9, 0); g.add(tip);
+      g.rotation.y = rotY; g.position.set(x, 0, z);
+      return g;
+    }
 
-      const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.7, 7, 0.7), metal);
-      p1.position.set(-7.5, 3.5, 0);
-      const p2 = new THREE.Mesh(new THREE.BoxGeometry(0.7, 7, 0.7), metal);
-      p2.position.set(7.5, 3.5, 0);
-      const topBar = new THREE.Mesh(new THREE.BoxGeometry(16, 0.8, 0.8), metal);
-      topBar.position.set(0, 7, 0);
-
-      const sign = new THREE.Mesh(new THREE.BoxGeometry(13, 2.2, 0.3), banner);
-      sign.position.set(0, 5.8, 0);
-
-      g.add(p1); g.add(p2); g.add(topBar); g.add(sign);
-      g.rotation.y = rotY;
+    function createBattery(x, z) {
+      const g = new THREE.Group();
+      const b = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, 9, 20), new THREE.MeshPhongMaterial({ color: 0x242424 }));
+      b.position.y = 4.5; g.add(b);
+      const top = new THREE.Mesh(new THREE.CylinderGeometry(2.42, 2.42, 2.2, 20), new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.9 }));
+      top.position.y = 7.9; g.add(top);
       g.position.set(x, 0, z);
       return g;
     }
 
-    // --- КАРТИ ---
+    function createBookStack(x, z, rotY) {
+      const g = new THREE.Group();
+      const colors = [0xb71540, 0x0a3d62, 0x38ada9];
+      for (let i = 0; i < 3; i++) {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(16, 2.5, 22), new THREE.MeshLambertMaterial({ color: colors[i] }));
+        m.position.set(0, 1.25 + i * 2.5, 0);
+        m.rotation.y = (i - 1) * 0.12;
+        g.add(m);
+      }
+      g.rotation.y = rotY; g.position.set(x, 0, z);
+      return g;
+    }
+
+    function createFinishArch(x, z, rotY) {
+      const g = new THREE.Group();
+      const pMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee, metalness: 0.6 });
+      const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.8, 9, 0.8), pMat); p1.position.set(-8.5, 4.5, 0);
+      const p2 = new THREE.Mesh(new THREE.BoxGeometry(0.8, 9, 0.8), pMat); p2.position.set(8.5, 4.5, 0);
+      const top = new THREE.Mesh(new THREE.BoxGeometry(18, 0.8, 0.8), pMat); top.position.set(0, 9, 0);
+      const sign = new THREE.Mesh(new THREE.BoxGeometry(15, 2.8, 0.3), new THREE.MeshLambertMaterial({ color: 0xd63031 }));
+      sign.position.set(0, 7.4, 0);
+      g.add(p1); g.add(p2); g.add(top); g.add(sign);
+      g.rotation.y = rotY; g.position.set(x, 0, z);
+      return g;
+    }
+
+    // --- ТРАСИ ТА НАДІЙНІ ЧЕКПОЇНТИ ---
     const tracks = [
       {
-        name: "Дитяча кімната",
-        pts: [[0, -30], [30, -30], [30, -15], [30, 0], [30, 15], [30, 30], [15, 30], [0, 30], [-15, 30], [-30, 30], [-30, 15], [-30, 0], [-30, -15], [-30, -30], [-15, -30]],
-        roads: [
-          { x: 0, z: -30, w: 72, d: 12 }, { x: 30, z: 0, w: 12, d: 60 },
-          { x: 0, z: 30, w: 72, d: 12 }, { x: -30, z: 0, w: 12, d: 60 }
+        name: "Велика спальня",
+        // Довгий замкнений маршрут по всій кімнаті
+        checkpoints: [
+          { x: 0, z: -55 }, { x: 45, z: -55 }, { x: 55, z: -25 }, { x: 25, z: 0 },
+          { x: 55, z: 25 }, { x: 55, z: 55 }, { x: 0, z: 55 }, { x: -45, z: 55 },
+          { x: -55, z: 20 }, { x: -20, z: -10 }, { x: -55, z: -35 }, { x: -25, z: -55 }
         ],
-        gantry: { x: 0, z: -30, rotY: 0 },
+        roads: [
+          { x: 0, z: -55, w: 90, d: 15, rot: 0 },
+          { x: 55, z: 0, w: 15, d: 90, rot: 0 },
+          { x: 0, z: 55, w: 90, d: 15, rot: 0 },
+          { x: -55, z: 0, w: 15, d: 90, rot: 0 },
+          { x: 5, z: 0, w: 15, d: 45, rot: 0.6 },
+          { x: -5, z: 0, w: 15, d: 45, rot: -0.6 }
+        ],
         props: [
-          { type: 'pencil', x: -10, z: -23, len: 16, rot: 0, col: 0x00a8ff },
-          { type: 'pencil', x: 23, z: -10, len: 14, rot: Math.PI / 2, col: 0x4cd137 },
-          { type: 'battery', x: -16, z: 16, rot: 0.4 },
-          { type: 'battery', x: 18, z: -16, rot: -0.2 },
-          { type: 'box', x: 0, z: 0, sx: 16, sy: 9, sz: 14, rot: 0.15 },
-          { type: 'box', x: -18, z: -14, sx: 9, sy: 6, sz: 8, rot: -0.3 }
-        ]
+          { type: 'books', x: 20, z: 20, rot: 0.3 },
+          { type: 'pencil', x: -20, z: -35, len: 26, rot: 0.2, col: 0x4cd137 },
+          { type: 'pencil', x: 25, z: -35, len: 24, rot: -0.4, col: 0x00a8ff },
+          { type: 'battery', x: -30, z: 30 },
+          { type: 'battery', x: 35, z: -15 }
+        ],
+        arch: { x: 0, z: -55, rot: 0 }
       },
       {
-        name: "Батарейний спідвей",
-        pts: [[0, -34], [25, -30], [35, -15], [35, 15], [25, 30], [0, 34], [-25, 30], [-35, 15], [-35, -15], [-25, -30]],
-        roads: [
-          { x: 0, z: -34, w: 62, d: 14 }, { x: 32, z: 0, w: 14, d: 62 },
-          { x: 0, z: 34, w: 62, d: 14 }, { x: -32, z: 0, w: 14, d: 62 }
+        name: "Кухня-Гран-прі",
+        checkpoints: [
+          { x: 0, z: -60 }, { x: 50, z: -40 }, { x: 60, z: 10 }, { x: 30, z: 50 },
+          { x: -20, z: 60 }, { x: -60, z: 30 }, { x: -40, z: -20 }, { x: -20, z: -50 }
         ],
-        gantry: { x: 0, z: -34, rotY: 0 },
+        roads: [
+          { x: 0, z: -60, w: 80, d: 16, rot: 0 },
+          { x: 55, z: -10, w: 16, d: 80, rot: 0.2 },
+          { x: 10, z: 55, w: 85, d: 16, rot: -0.1 },
+          { x: -50, z: 10, w: 16, d: 80, rot: -0.2 }
+        ],
         props: [
-          { type: 'battery', x: -12, z: 0, rot: 0 },
-          { type: 'battery', x: 0, z: 0, rot: 0 },
-          { type: 'battery', x: 12, z: 0, rot: 0 },
-          { type: 'pencil', x: 0, z: -26, len: 24, rot: 0, col: 0xe84118 },
-          { type: 'pencil', x: 0, z: 26, len: 24, rot: 0, col: 0xfbc531 },
-          { type: 'box', x: -18, z: 18, sx: 10, sy: 7, sz: 10, rot: 0.5 }
-        ]
+          { type: 'battery', x: 0, z: 0 },
+          { type: 'battery', x: 15, z: 0 },
+          { type: 'battery', x: -15, z: 0 },
+          { type: 'pencil', x: 0, z: 25, len: 32, rot: 0, col: 0xe84118 }
+        ],
+        arch: { x: 0, z: -60, rot: 0 }
       }
     ];
 
@@ -432,101 +414,67 @@
     const trackGroup = new THREE.Group();
     S.add(trackGroup);
 
-    const asphaltMat = new THREE.MeshLambertMaterial({ color: 0x22262c });
-    const curbRed = new THREE.MeshLambertMaterial({ color: 0xd63031 });
-    const curbWhite = new THREE.MeshLambertMaterial({ color: 0xf5f6fa });
-
-    function spawnCurbs(roads) {
-      roads.forEach(r => {
-        const isHoriz = r.w > r.d;
-        const len = isHoriz ? r.w : r.d;
-        const segs = Math.floor(len / 3.2);
-        for (let i = 0; i < segs; i++) {
-          const mat = i % 2 === 0 ? curbRed : curbWhite;
-          const c1 = new THREE.Mesh(new THREE.BoxGeometry(isHoriz ? 3.2 : 0.8, 0.2, isHoriz ? 0.8 : 3.2), mat);
-          const c2 = c1.clone();
-          if (isHoriz) {
-            c1.position.set(r.x - r.w / 2 + i * 3.2 + 1.6, 0.1, r.z - r.d / 2);
-            c2.position.set(r.x - r.w / 2 + i * 3.2 + 1.6, 0.1, r.z + r.d / 2);
-          } else {
-            c1.position.set(r.x - r.w / 2, 0.1, r.z - r.d / 2 + i * 3.2 + 1.6);
-            c2.position.set(r.x + r.w / 2, 0.1, r.z - r.d / 2 + i * 3.2 + 1.6);
-          }
-          trackGroup.add(c1);
-          trackGroup.add(c2);
-        }
-      });
-    }
-
-    function spawnFinishCheckers(startPt) {
-      const g = new THREE.Group();
-      for (let x = -5.5; x <= 5.5; x += 1.3) {
-        for (let z = -1.2; z <= 1.2; z += 1.2) {
-          const isDark = (Math.round((x + 5.5) / 1.3) + Math.round((z + 1.2) / 1.2)) % 2 === 0;
-          const quad = new THREE.Mesh(
-            new THREE.PlaneGeometry(1.3, 1.2),
-            new THREE.MeshBasicMaterial({ color: isDark ? 0x111111 : 0xffffff })
-          );
-          quad.rotation.x = -Math.PI / 2;
-          quad.position.set(startPt[0] + x, 0.09, startPt[1] + z);
-          g.add(quad);
-        }
-      }
-      trackGroup.add(g);
-    }
-
     const pickups = [];
     const pickupMat = new THREE.MeshLambertMaterial({ color: 0xffca28 });
+
     function buildTrack(idx) {
-      while (trackGroup.children.length > 0) {
-        trackGroup.remove(trackGroup.children[0]);
-      }
+      while (trackGroup.children.length > 0) trackGroup.remove(trackGroup.children[0]);
       pickups.length = 0;
 
       const t = tracks[idx];
       t.roads.forEach(r => {
         const m = new THREE.Mesh(new THREE.BoxGeometry(r.w, 0.08, r.d), asphaltMat);
         m.position.set(r.x, 0.04, r.z);
+        m.rotation.y = r.rot || 0;
         trackGroup.add(m);
       });
 
-      spawnCurbs(t.roads);
-      spawnFinishCheckers(t.pts[0]);
-      trackGroup.add(createGantry(t.gantry.x, t.gantry.z, t.gantry.rotY));
+      trackGroup.add(createFinishArch(t.arch.x, t.arch.z, t.arch.rot));
 
-      // Спавн речей кімнати
       t.props.forEach(p => {
-        if (p.type === 'pencil') trackGroup.add(createGiantPencil(p.x, p.z, p.len, p.rot, p.col));
-        if (p.type === 'battery') trackGroup.add(createGiantBattery(p.x, p.z, p.rot));
-        if (p.type === 'box') trackGroup.add(createCardboardBox(p.x, p.z, p.sx, p.sy, p.sz, p.rot));
+        if (p.type === 'pencil') trackGroup.add(createPencil(p.x, p.z, p.len, p.rot, p.col));
+        if (p.type === 'battery') trackGroup.add(createBattery(p.x, p.z));
+        if (p.type === 'books') trackGroup.add(createBookStack(p.x, p.z, p.rot));
       });
 
-      // Золоті куби бонуси Re-Volt
-      [t.pts[2], t.pts[Math.floor(t.pts.length / 2)], t.pts[t.pts.length - 3]].forEach(pos => {
-        const p = new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.7, 1.7), pickupMat);
-        p.position.set(pos[0], 1.3, pos[1]);
+      // Бонуси в 3 ключових точках треку
+      [t.checkpoints[2], t.checkpoints[Math.floor(t.checkpoints.length / 2)], t.checkpoints[t.checkpoints.length - 2]].forEach(pos => {
+        const p = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.8, 1.8), pickupMat);
+        p.position.set(pos.x, 1.3, pos.z);
         trackGroup.add(p);
         pickups.push({ mesh: p, active: true, respawn: 0 });
       });
     }
 
-    // Гонщики (Гравець - Червоний багі #07, Боти - Синій #02 та Зелений #09)
-    const player = createRCBuggy(0xe84118, "07");
+    // Створення болідів
+    let playerCarIdx = 0;
+    let player = createVehicle(carProfiles[playerCarIdx]);
     const aiCars = [
-      { car: createRCBuggy(0x0097e6, "02"), x: -3.8, z: -30, a: Math.PI, v: 16.5, targetIdx: 1, prog: 0, lap: 1 },
-      { car: createRCBuggy(0x44bd32, "09"), x: 3.8, z: -30, a: Math.PI, v: 15.0, targetIdx: 1, prog: 0, lap: 1 }
+      { v: createVehicle(carProfiles[1]), x: -3.8, z: -55, a: Math.PI, spd: 18, cpIdx: 1, lap: 1 },
+      { v: createVehicle(carProfiles[2]), x: 3.8, z: -55, a: Math.PI, spd: 17, cpIdx: 1, lap: 1 }
     ];
 
-    let px = 0, pz = -30, pvx = 0, pvz = 0, pa = Math.PI, forwardSpeed = 0;
-    let pLap = 1, pProg = 0, boostTimer = 0, hasItem = false;
+    let px = 0, pz = -55, pvx = 0, pvz = 0, pa = Math.PI, forwardSpeed = 0;
+    let pLap = 1, nextCheckpoint = 1, boostTimer = 0, hasItem = false, isFinished = false;
 
     function resetPositions() {
-      const curTrack = tracks[currentTrackIdx];
-      px = curTrack.pts[0][0]; pz = curTrack.pts[0][1];
+      const curT = tracks[currentTrackIdx];
+      const start = curT.checkpoints[0];
+      px = start.x; pz = start.z;
       pvx = 0; pvz = 0; pa = Math.PI; forwardSpeed = 0;
-      pLap = 1; pProg = 0;
-      aiCars[0].x = px - 3.8; aiCars[0].z = pz; aiCars[0].a = Math.PI; aiCars[0].targetIdx = 1; aiCars[0].lap = 1;
-      aiCars[1].x = px + 3.8; aiCars[1].z = pz; aiCars[1].a = Math.PI; aiCars[1].targetIdx = 1; aiCars[1].lap = 1;
+      pLap = 1; nextCheckpoint = 1; isFinished = false;
+      document.getElementById('finish-banner').style.display = 'none';
+
+      aiCars[0].x = start.x - 3.8; aiCars[0].z = start.z; aiCars[0].a = Math.PI; aiCars[0].cpIdx = 1; aiCars[0].lap = 1;
+      aiCars[1].x = start.x + 3.8; aiCars[1].z = start.z; aiCars[1].a = Math.PI; aiCars[1].cpIdx = 1; aiCars[1].lap = 1;
+    }
+
+    function selectCar(idx) {
+      playerCarIdx = idx;
+      S.remove(player.root);
+      player = createVehicle(carProfiles[playerCarIdx]);
+      document.getElementById('garage-menu').style.display = 'none';
+      resetPositions();
     }
 
     function loadTrack(idx) {
@@ -536,9 +484,16 @@
       document.getElementById('track-menu').style.display = 'none';
     }
 
+    // Меню
+    document.getElementById('garage-btn').onclick = () => {
+      const g = document.getElementById('garage-menu');
+      g.style.display = g.style.display === 'flex' ? 'none' : 'flex';
+      document.getElementById('track-menu').style.display = 'none';
+    };
     document.getElementById('map-btn').onclick = () => {
       const m = document.getElementById('track-menu');
       m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+      document.getElementById('garage-menu').style.display = 'none';
     };
 
     // Керування
@@ -559,7 +514,7 @@
     function usePowerup() {
       if (!hasItem) return;
       hasItem = false;
-      boostTimer = 3.0;
+      boostTimer = 3.2;
       document.getElementById('powerup-slot').textContent = '❓';
       actBtn.style.display = 'none';
     }
@@ -568,9 +523,9 @@
 
     const rstBtn = document.getElementById('RST');
     function resetCar() {
-      const curPts = tracks[currentTrackIdx].pts;
-      const curPt = curPts[Math.floor(pProg) % curPts.length];
-      px = curPt[0]; pz = curPt[1];
+      const curT = tracks[currentTrackIdx];
+      const targetCp = curT.checkpoints[(nextCheckpoint - 1 + curT.checkpoints.length) % curT.checkpoints.length];
+      px = targetCp.x; pz = targetCp.z;
       pvx = 0; pvz = 0; forwardSpeed = 0;
     }
     rstBtn.addEventListener('touchstart', ev => { ev.preventDefault(); resetCar(); }, { passive: false });
@@ -591,64 +546,12 @@
       if (e.key === 'ArrowDown' || e.key === 's') I.b = 0;
     });
 
-    // Відштовхування від предметів (колізії)
-    function resolveSolidCollisions(entity, isPlayer) {
-      const carRadius = 1.4;
-      if (entity.x > 49) { entity.x = 49; if (isPlayer) { forwardSpeed *= -0.3; pvx = -8; } }
-      if (entity.x < -49) { entity.x = -49; if (isPlayer) { forwardSpeed *= -0.3; pvx = 8; } }
-      if (entity.z > 49) { entity.z = 49; if (isPlayer) { forwardSpeed *= -0.3; pvz = -8; } }
-      if (entity.z < -49) { entity.z = -49; if (isPlayer) { forwardSpeed *= -0.3; pvz = 8; } }
-
-      const curProps = tracks[currentTrackIdx].props;
-      for (let p of curProps) {
-        if (p.type === 'box') {
-          const hw = p.sx / 2, hd = p.sz / 2;
-          const cx = Math.max(p.x - hw, Math.min(p.x + hw, entity.x));
-          const cz = Math.max(p.z - hd, Math.min(p.z + hd, entity.z));
-          const dx = entity.x - cx, dz = entity.z - cz;
-          const distSq = dx * dx + dz * dz;
-          if (distSq < carRadius * carRadius) {
-            const dist = Math.sqrt(distSq) || 0.001;
-            const push = carRadius - dist;
-            entity.x += (dx / dist) * push; entity.z += (dz / dist) * push;
-            if (isPlayer) { forwardSpeed *= -0.4; pvx = (dx / dist) * 12; pvz = (dz / dist) * 12; }
-          }
-        } else if (p.type === 'battery') {
-          const br = 2.3 + carRadius;
-          const dx = entity.x - p.x, dz = entity.z - p.z;
-          const distSq = dx * dx + dz * dz;
-          if (distSq < br * br) {
-            const dist = Math.sqrt(distSq) || 0.001;
-            const push = br - dist;
-            entity.x += (dx / dist) * push; entity.z += (dz / dist) * push;
-            if (isPlayer) { forwardSpeed *= -0.4; pvx = (dx / dist) * 12; pvz = (dz / dist) * 12; }
-          }
-        } else if (p.type === 'pencil') {
-          const pr = 1.0 + carRadius;
-          const dx = entity.x - p.x, dz = entity.z - p.z;
-          if (dx * dx + dz * dz < pr * pr) {
-            const dist = Math.hypot(dx, dz) || 0.001;
-            entity.x += (dx / dist) * (pr - dist);
-            entity.z += (dz / dist) * (pr - dist);
-            if (isPlayer) { forwardSpeed *= -0.4; pvx = (dx / dist) * 10; pvz = (dz / dist) * 10; }
-          }
-        }
-      }
-    }
-
-    function getProgress(cx, cz) {
-      const curPts = tracks[currentTrackIdx].pts;
-      let best = 1e9, o = 0;
-      for (let i = 0; i < curPts.length; i++) {
-        let A = curPts[i], B = curPts[(i + 1) % curPts.length];
-        let dx = B[0] - A[0], dz = B[1] - A[1];
-        let q = ((cx - A[0]) * dx + (cz - A[1]) * dz) / (dx * dx + dz * dz);
-        q = Math.max(0, Math.min(1, q));
-        let tx = A[0] + dx * q, tz = A[1] + dz * q;
-        let d = (cx - tx) * (cx - tx) + (cz - tz) * (cz - tz);
-        if (d < best) { best = d; o = i + q; }
-      }
-      return o;
+    // Відштовхування від стін кімнати
+    function resolveWalls(entity) {
+      if (entity.x > 84) { entity.x = 84; forwardSpeed *= -0.3; pvx = -10; }
+      if (entity.x < -84) { entity.x = -84; forwardSpeed *= -0.3; pvx = 10; }
+      if (entity.z > 84) { entity.z = 84; forwardSpeed *= -0.3; pvz = -10; }
+      if (entity.z < -84) { entity.z = -84; forwardSpeed *= -0.3; pvz = 10; }
     }
 
     loadTrack(0);
@@ -659,12 +562,23 @@
       const dt = Math.min((now - lastTime) / 1000, 0.05);
       lastTime = now;
 
-      // Динаміка Re-Volt (швидке прискорення)
-      const maxSpd = boostTimer > 0 ? 46 : 28;
-      const accel = boostTimer > 0 ? 40 : 24;
+      // Оновлення частинок диму
+      particles.forEach(pt => {
+        if (pt.life > 0) {
+          pt.life -= dt;
+          pt.mesh.position.y += dt * 0.8;
+          pt.mesh.scale.addScalar(dt * 1.5);
+          pt.mesh.material.opacity = (pt.life / 0.45) * 0.5;
+          if (pt.life <= 0) pt.mesh.visible = false;
+        }
+      });
+
+      const profile = player.profile;
+      const maxSpd = boostTimer > 0 ? profile.spd * 1.45 : profile.spd;
+      const accelRate = boostTimer > 0 ? profile.acc * 1.5 : profile.acc;
       if (boostTimer > 0) boostTimer -= dt;
 
-      if (I.g) forwardSpeed += accel * dt;
+      if (I.g) forwardSpeed += accelRate * dt;
       if (I.b) forwardSpeed -= 34 * dt;
       forwardSpeed *= 0.982;
       forwardSpeed = Math.max(-8, Math.min(maxSpd, forwardSpeed));
@@ -672,9 +586,9 @@
       // Кермо
       const steer = (I.r ? 1 : 0) - (I.l ? 1 : 0);
       const moveDirection = forwardSpeed >= -0.1 ? 1 : -1;
-      pa -= steer * 3.1 * dt * (Math.abs(forwardSpeed) / 13 + 0.2) * moveDirection;
+      pa -= steer * profile.steer * dt * (Math.abs(forwardSpeed) / 14 + 0.2) * moveDirection;
 
-      // Інерційний дрифт
+      // Фізика руху та дрифту
       const targetVx = Math.sin(pa) * forwardSpeed;
       const targetVz = Math.cos(pa) * forwardSpeed;
       pvx += (targetVx - pvx) * 8.8 * dt;
@@ -684,46 +598,55 @@
       pz += pvz * dt;
 
       const playerEntity = { x: px, z: pz };
-      resolveSolidCollisions(playerEntity, true);
-      px = playerEntity.x;
-      pz = playerEntity.z;
+      resolveWalls(playerEntity);
+      px = playerEntity.x; pz = playerEntity.z;
 
-      // Зіткнення машинок
+      // Дим з-під коліс під час різких поворотів або форсажу
+      if ((Math.abs(steer) > 0 && Math.abs(forwardSpeed) > 16) || boostTimer > 0) {
+        emitSmoke(px - Math.sin(pa) * 1.4, 0.2, pz - Math.cos(pa) * 1.4);
+      }
+
+      // Таран з AI суперниками
       aiCars.forEach(ai => {
         const dx = px - ai.x, dz = pz - ai.z;
         const dist = Math.hypot(dx, dz);
-        if (dist < 2.7 && dist > 0.01) {
+        if (dist < 3.0 && dist > 0.01) {
           const nx = dx / dist, nz = dz / dist;
-          const overlap = 2.7 - dist;
-          px += nx * overlap * 0.5; pz += nz * overlap * 0.5;
-          ai.x -= nx * overlap * 0.5; ai.z -= nz * overlap * 0.5;
-          pvx += nx * 6; pvz += nz * 6;
-          forwardSpeed *= 0.65;
+          const push = 3.0 - dist;
+          px += nx * push * 0.5; pz += nz * push * 0.5;
+          ai.x -= nx * push * 0.5; ai.z -= nz * push * 0.5;
+          pvx += nx * 8; pvz += nz * 8;
+          forwardSpeed *= 0.7;
         }
       });
 
-      // Анімації багі гравця
       player.root.position.set(px, 0.05, pz);
       player.root.rotation.y = pa;
-      player.bodyGroup.rotation.z = -steer * 0.16 * (Math.abs(forwardSpeed) / maxSpd);
+      player.bodyGroup.rotation.z = -steer * 0.15 * (Math.abs(forwardSpeed) / maxSpd);
       player.bodyGroup.rotation.x = (I.g ? -0.05 : 0) + (I.b ? 0.08 : 0);
-      
-      // Хитання антени та вимпела
-      player.antenna.rotation.z = steer * 0.38;
+      player.antenna.rotation.z = steer * 0.35;
       player.antenna.rotation.x = -(forwardSpeed / maxSpd) * 0.55 + Math.sin(now * 0.015) * 0.08;
-      player.pennant.rotation.y = Math.sin(now * 0.03) * 0.25;
-
-      // Обертання передніх і задніх коліс
       player.wheels.forEach(w => w.children[0].rotation.x += forwardSpeed * 0.25);
 
-      // Чекпоїнти
-      const curPts = tracks[currentTrackIdx].pts;
-      const q = getProgress(px, pz);
-      if (q > curPts.length - 1 && pProg < 1.5) {
-        pLap++;
-        if (pLap > 3) pLap = 3;
+      // --- НАДІЙНИЙ ПІДРАХУНОК КІЛ (СИСТЕМА ЧЕКПОЇНТІВ) ---
+      const curT = tracks[currentTrackIdx];
+      const targetCp = curT.checkpoints[nextCheckpoint];
+      const distToCp = Math.hypot(px - targetCp.x, pz - targetCp.z);
+
+      if (distToCp < 15.0) {
+        nextCheckpoint = (nextCheckpoint + 1) % curT.checkpoints.length;
+        // Перетнув фініш (повернувся до точки 1 після проходження всіх точок)
+        if (nextCheckpoint === 1) {
+          pLap++;
+          if (pLap > 3) {
+            pLap = 3;
+            if (!isFinished) {
+              isFinished = true;
+              document.getElementById('finish-banner').style.display = 'block';
+            }
+          }
+        }
       }
-      pProg = q;
 
       // Бонуси
       pickups.forEach(p => {
@@ -731,9 +654,9 @@
           p.respawn -= dt;
           if (p.respawn <= 0) { p.active = true; p.mesh.visible = true; }
         } else {
-          p.mesh.rotation.y += 2.2 * dt;
-          p.mesh.position.y = 1.3 + Math.sin(now * 0.003) * 0.25;
-          if (Math.hypot(px - p.mesh.position.x, pz - p.mesh.position.z) < 2.3) {
+          p.mesh.rotation.y += 2.4 * dt;
+          p.mesh.position.y = 1.3 + Math.sin(now * 0.004) * 0.25;
+          if (Math.hypot(px - p.mesh.position.x, pz - p.mesh.position.z) < 2.6) {
             p.active = false;
             p.mesh.visible = false;
             p.respawn = 5;
@@ -746,10 +669,10 @@
         }
       });
 
-      // AI суперники
+      // AI суперники рухаються по чекпоїнтах
       aiCars.forEach(ai => {
-        const target = curPts[ai.targetIdx];
-        const tdx = target[0] - ai.x, tdz = target[1] - ai.z;
+        const target = curT.checkpoints[ai.cpIdx];
+        const tdx = target.x - ai.x, tdz = target.z - ai.z;
         const targetAngle = Math.atan2(tdx, tdz);
 
         let diff = targetAngle - ai.a;
@@ -757,46 +680,40 @@
         while (diff < -Math.PI) diff += Math.PI * 2;
 
         ai.a += Math.sign(diff) * Math.min(Math.abs(diff), 3.2 * dt);
-        ai.x += Math.sin(ai.a) * ai.v * dt;
-        ai.z += Math.cos(ai.a) * ai.v * dt;
+        ai.x += Math.sin(ai.a) * ai.spd * dt;
+        ai.z += Math.cos(ai.a) * ai.spd * dt;
 
-        resolveSolidCollisions(ai, false);
+        ai.v.root.position.set(ai.x, 0.05, ai.z);
+        ai.v.root.rotation.y = ai.a;
+        ai.v.antenna.rotation.x = -0.3 + Math.sin(now * 0.008 + ai.x) * 0.05;
+        ai.v.wheels.forEach(w => w.children[0].rotation.x += ai.spd * 0.25);
 
-        ai.car.root.position.set(ai.x, 0.05, ai.z);
-        ai.car.root.rotation.y = ai.a;
-        ai.car.antenna.rotation.x = -0.3 + Math.sin(now * 0.008 + ai.x) * 0.05;
-        ai.car.wheels.forEach(w => w.children[0].rotation.x += ai.v * 0.25);
-
-        if (Math.hypot(tdx, tdz) < 4.8) {
-          ai.targetIdx = (ai.targetIdx + 1) % curPts.length;
+        if (Math.hypot(tdx, tdz) < 12.0) {
+          ai.cpIdx = (ai.cpIdx + 1) % curT.checkpoints.length;
+          if (ai.cpIdx === 1) ai.lap++;
         }
-
-        const aiQ = getProgress(ai.x, ai.z);
-        if (aiQ > curPts.length - 1 && ai.prog < 1.5) ai.lap++;
-        ai.prog = aiQ;
       });
 
       // Рейтинг
-      const pScore = (pLap - 1) * curPts.length + pProg;
+      const pScore = (pLap - 1) * curT.checkpoints.length + nextCheckpoint;
       let rank = 1;
       aiCars.forEach(ai => {
-        const aiScore = (ai.lap - 1) * curPts.length + ai.prog;
+        const aiScore = (ai.lap - 1) * curT.checkpoints.length + ai.cpIdx;
         if (aiScore > pScore) rank++;
       });
 
-      // HUD
       document.getElementById('s').textContent = Math.round(Math.abs(forwardSpeed) * 7.5);
       document.getElementById('l').textContent = Math.min(pLap, 3);
       document.getElementById('pos').textContent = rank;
 
-      // Динамічна камера за багі
+      // Динамічна камера за машинкою
       const camTarget = new THREE.Vector3(
-        px - Math.sin(pa) * 8.6,
-        5.4,
-        pz - Math.cos(pa) * 8.6
+        px - Math.sin(pa) * 9.2,
+        5.6,
+        pz - Math.cos(pa) * 9.2
       );
       C.position.lerp(camTarget, 0.14);
-      C.lookAt(px, 1.1, pz);
+      C.lookAt(px, 1.2, pz);
 
       R.render(S, C);
     }
