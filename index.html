@@ -2,62 +2,83 @@
 <html lang="uk">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <title>Toy Rush</title>
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
     html, body {
       margin: 0;
+      padding: 0;
+      width: 100%;
       height: 100%;
       overflow: hidden;
       background: #9ec6df;
       touch-action: none;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      -webkit-user-select: none;
       user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+      z-index: 1;
+      display: block;
     }
     #hud {
       position: fixed;
-      top: 12px;
-      left: 12px;
+      top: env(safe-area-inset-top, 14px);
+      left: 14px;
       color: #fff;
       background: rgba(0, 0, 0, 0.7);
       padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 600;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
       z-index: 10;
       display: flex;
       gap: 12px;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     #powerup-slot {
       position: fixed;
-      top: 12px;
-      right: 12px;
+      top: env(safe-area-inset-top, 14px);
+      right: 14px;
       width: 50px;
       height: 50px;
       background: rgba(0, 0, 0, 0.7);
       border: 2px solid #ffca28;
-      border-radius: 12px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 24px;
       z-index: 10;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     #c {
       position: fixed;
-      bottom: 18px;
+      bottom: calc(env(safe-area-inset-bottom, 16px) + 10px);
       left: 0;
       right: 0;
       display: flex;
       justify-content: space-between;
       padding: 0 16px;
       z-index: 10;
+      pointer-events: none;
     }
     .g {
       display: flex;
       gap: 12px;
       align-items: flex-end;
+      pointer-events: auto;
     }
     button {
       width: 66px;
@@ -71,22 +92,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      outline: none;
     }
     button:active {
       background: rgba(255, 255, 255, 0.35);
-      transform: scale(0.95);
+      transform: scale(0.94);
     }
     #ACT {
-      background: rgba(255, 179, 0, 0.8);
+      background: rgba(255, 179, 0, 0.85);
       border-color: #ffe082;
       display: none;
     }
     #RST {
-      width: 46px;
-      height: 46px;
+      width: 48px;
+      height: 48px;
       font-size: 18px;
-      background: rgba(80, 20, 20, 0.8);
+      background: rgba(180, 40, 40, 0.8);
     }
   </style>
 </head>
@@ -103,7 +126,7 @@
     <div class="g">
       <button id="L">◀</button>
       <button id="R">▶</button>
-      <button id="RST" title="Скинути на трасу">↺</button>
+      <button id="RST">↺</button>
     </div>
     <div class="g">
       <button id="ACT">⚡</button>
@@ -116,38 +139,41 @@
   <script>
     const S = new THREE.Scene();
     S.background = new THREE.Color(0x9ec6df);
-    S.fog = new THREE.Fog(0x9ec6df, 30, 140);
+    S.fog = new THREE.Fog(0x9ec6df, 40, 160);
 
-    const C = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 250);
-    const R = new THREE.WebGLRenderer({ antialias: true });
-    R.setSize(innerWidth, innerHeight);
-    R.setPixelRatio(Math.min(devicePixelRatio, 2));
+    const C = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 300);
+    C.position.set(0, 5, -19.5);
+    C.lookAt(0, 0.9, -28);
+
+    const R = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    R.setSize(window.innerWidth, window.innerHeight);
+    R.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     R.shadowMap.enabled = true;
-    R.shadowMap.type = THREE.PCFSoftShadowMap;
+    R.shadowMap.type = THREE.PCFShadowMap;
     document.body.appendChild(R.domElement);
 
-    S.add(new THREE.HemisphereLight(0xffffff, 0x554433, 2.2));
-    const dl = new THREE.DirectionalLight(0xffffff, 2.2);
+    S.add(new THREE.AmbientLight(0xffffff, 1.2));
+    const dl = new THREE.DirectionalLight(0xffffff, 1.8);
     dl.position.set(30, 45, 15);
     dl.castShadow = true;
-    dl.shadow.mapSize.width = 2048;
-    dl.shadow.mapSize.height = 2048;
+    dl.shadow.mapSize.width = 1024;
+    dl.shadow.mapSize.height = 1024;
     dl.shadow.camera.near = 10;
-    dl.shadow.camera.far = 150;
-    dl.shadow.camera.left = -60;
-    dl.shadow.camera.right = 60;
-    dl.shadow.camera.top = 60;
-    dl.shadow.camera.bottom = -60;
+    dl.shadow.camera.far = 140;
+    dl.shadow.camera.left = -55;
+    dl.shadow.camera.right = 55;
+    dl.shadow.camera.top = 55;
+    dl.shadow.camera.bottom = -55;
     S.add(dl);
 
-    // Підлога кімнати (паркет)
-    const f = new THREE.Mesh(
+    // Підлога
+    const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(180, 180),
       new THREE.MeshStandardMaterial({ color: 0xb59d79, roughness: 0.8 })
     );
-    f.rotation.x = -Math.PI / 2;
-    f.receiveShadow = true;
-    S.add(f);
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    S.add(floor);
 
     function box(x, z, w, d, h, col) {
       const m = new THREE.Mesh(
@@ -161,13 +187,13 @@
       return m;
     }
 
-    // Стіни кімнати
+    // Стіни
     box(0, -44, 92, 3, 5, 0x4e3629);
     box(0, 44, 92, 3, 5, 0x4e3629);
     box(-44, 0, 3, 92, 5, 0x4e3629);
     box(44, 0, 3, 92, 5, 0x4e3629);
 
-    // Дорожнє полотно
+    // Траса
     const rm = new THREE.MeshStandardMaterial({ color: 0x383838, roughness: 0.9 });
     function road(x, z, w, d) {
       const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.08, d), rm);
@@ -180,19 +206,18 @@
     road(0, 28, 70, 11);
     road(-28, 0, 11, 56);
 
-    // Меблі-перешкоди
+    // Меблі
     box(-22, -17, 14, 8, 5, 0x6d4c41);
     box(22, 16, 12, 7, 5, 0x5d4037);
     box(-22, 23, 8, 10, 4, 0x795548);
     box(23, -23, 10, 6, 4, 0x4e342e);
 
-    // Модель машинки Re-Volt з антеною
+    // Створення машинки
     function createCar(col) {
       const root = new THREE.Group();
       const bodyGroup = new THREE.Group();
       root.add(bodyGroup);
 
-      // Основний кузов
       const body = new THREE.Mesh(
         new THREE.BoxGeometry(2.3, 0.65, 4),
         new THREE.MeshStandardMaterial({ color: col, metalness: 0.2, roughness: 0.4 })
@@ -201,7 +226,6 @@
       body.castShadow = true;
       bodyGroup.add(body);
 
-      // Кабіна
       const cabin = new THREE.Mesh(
         new THREE.BoxGeometry(1.5, 0.6, 1.7),
         new THREE.MeshStandardMaterial({ color: 0x212121, roughness: 0.3 })
@@ -210,7 +234,6 @@
       cabin.castShadow = true;
       bodyGroup.add(cabin);
 
-      // Радіоантена
       const antennaPole = new THREE.Mesh(
         new THREE.CylinderGeometry(0.02, 0.02, 2.2),
         new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.8 })
@@ -228,7 +251,6 @@
       antenna.add(antennaTip);
       bodyGroup.add(antenna);
 
-      // Колеса
       const wheels = [];
       for (let wx of [-1.15, 1.15]) {
         for (let wz of [-1.25, 1.25]) {
@@ -253,20 +275,17 @@
     let boostTimer = 0;
     let hasItem = false;
 
-    // AI Суперники
     const aiCars = [
       { car: createCar(0x1e88e5), x: -4, z: -28, a: Math.PI, v: 16, targetIdx: 1, prog: 0, lap: 1 },
       { car: createCar(0x43a047), x: 4, z: -28, a: Math.PI, v: 14.5, targetIdx: 1, prog: 0, lap: 1 }
     ];
 
-    // Точки маршруту
     const pts = [
       [0, -28], [28, -28], [28, -14], [28, 0], [28, 14], [28, 28],
       [14, 28], [0, 28], [-14, 28], [-28, 28], [-28, 14], [-28, 0],
       [-28, -14], [-28, -28], [-14, -28]
     ];
 
-    // Бокс із бонусом (Pickup)
     const pickups = [];
     const pickupGeo = new THREE.BoxGeometry(1.6, 1.6, 1.6);
     const pickupMat = new THREE.MeshStandardMaterial({
@@ -276,57 +295,58 @@
       roughness: 0.2
     });
 
-    const pickupPositions = [[28, 0], [0, 28], [-28, 0]];
-    pickupPositions.forEach(p => {
+    [[28, 0], [0, 28], [-28, 0]].forEach(p => {
       const mesh = new THREE.Mesh(pickupGeo, pickupMat);
       mesh.position.set(p[0], 1.2, p[1]);
       S.add(mesh);
-      pickups.push({ mesh, active: true, respawn: 0, basePos: p });
+      pickups.push({ mesh, active: true, respawn: 0 });
     });
 
-    // Керування
     const I = { l: 0, r: 0, g: 0, b: 0 };
     function bind(id, k) {
       const e = document.getElementById(id);
-      e.onpointerdown = () => I[k] = 1;
-      e.onpointerup = e.onpointercancel = e.onpointerleave = () => I[k] = 0;
+      if (!e) return;
+      const down = ev => { ev.preventDefault(); I[k] = 1; };
+      const up = ev => { ev.preventDefault(); I[k] = 0; };
+      e.addEventListener('pointerdown', down);
+      e.addEventListener('pointerup', up);
+      e.addEventListener('pointercancel', up);
+      e.addEventListener('pointerleave', up);
     }
     bind('L', 'l'); bind('R', 'r'); bind('G', 'g'); bind('B', 'b');
 
-    // Кнопка та клавіша активації бонусу
     const actBtn = document.getElementById('ACT');
     function usePowerup() {
       if (!hasItem) return;
       hasItem = false;
-      boostTimer = 2.5; // 2.5 секунди потужного прискорення
+      boostTimer = 2.5;
       document.getElementById('powerup-slot').textContent = '❓';
       actBtn.style.display = 'none';
     }
-    actBtn.onclick = usePowerup;
+    actBtn.addEventListener('pointerdown', ev => { ev.preventDefault(); usePowerup(); });
 
-    // Скидання машинки назад на трасу (Reset)
     function resetCar() {
       const curPt = pts[Math.floor(pProg) % pts.length];
       px = curPt[0];
       pz = curPt[1];
       pv = 0;
     }
-    document.getElementById('RST').onclick = resetCar;
+    document.getElementById('RST').addEventListener('pointerdown', ev => { ev.preventDefault(); resetCar(); });
 
-    window.onkeydown = e => {
+    window.addEventListener('keydown', e => {
       if (e.key === 'ArrowLeft' || e.key === 'a') I.l = 1;
       if (e.key === 'ArrowRight' || e.key === 'd') I.r = 1;
       if (e.key === 'ArrowUp' || e.key === 'w') I.g = 1;
       if (e.key === 'ArrowDown' || e.key === 's') I.b = 1;
       if (e.code === 'Space') usePowerup();
       if (e.key === 'r') resetCar();
-    };
-    window.onkeyup = e => {
+    });
+    window.addEventListener('keyup', e => {
       if (e.key === 'ArrowLeft' || e.key === 'a') I.l = 0;
       if (e.key === 'ArrowRight' || e.key === 'd') I.r = 0;
       if (e.key === 'ArrowUp' || e.key === 'w') I.g = 0;
       if (e.key === 'ArrowDown' || e.key === 's') I.b = 0;
-    };
+    });
 
     function getProgress(cx, cz) {
       let best = 1e9, o = 0;
@@ -335,20 +355,19 @@
         let dx = B[0] - A[0], dz = B[1] - A[1];
         let q = ((cx - A[0]) * dx + (cz - A[1]) * dz) / (dx * dx + dz * dz);
         q = Math.max(0, Math.min(1, q));
-        let px = A[0] + dx * q, pz = A[1] + dz * q;
-        let d = (cx - px) ** 2 + (cz - pz) ** 2;
+        let tx = A[0] + dx * q, tz = A[1] + dz * q;
+        let d = (cx - tx) ** 2 + (cz - tz) ** 2;
         if (d < best) { best = d; o = i + q; }
       }
       return o;
     }
 
-    let clock = performance.now();
-    function tick(now) {
+    const clock = new THREE.Clock();
+    function tick() {
       requestAnimationFrame(tick);
-      const dt = Math.min((now - clock) / 1000, 0.1);
-      clock = now;
+      const dt = Math.min(clock.getDelta(), 0.05);
+      const elapsed = clock.getElapsedTime();
 
-      // Прискорення / Турбо
       const maxSpeed = boostTimer > 0 ? 42 : 26;
       const accel = boostTimer > 0 ? 35 : 20;
       if (boostTimer > 0) boostTimer -= dt;
@@ -358,7 +377,6 @@
       pv *= 0.975;
       pv = Math.max(-7, Math.min(maxSpeed, pv));
 
-      // Поворот і рух гравця
       const steerInput = (I.r ? 1 : 0) - (I.l ? 1 : 0);
       pa += steerInput * 2.8 * dt * (Math.abs(pv) / 14 + 0.15);
       px += Math.sin(pa) * pv * dt;
@@ -366,18 +384,14 @@
       px = Math.max(-41, Math.min(41, px));
       pz = Math.max(-41, Math.min(41, pz));
 
-      // Фізика кузова Re-Volt (крен та антена)
       player.root.position.set(px, 0.05, pz);
       player.root.rotation.y = pa;
-      player.bodyGroup.rotation.z = -steerInput * 0.12 * (pv / maxSpeed); // крен на повороті
-      player.bodyGroup.rotation.x = (I.g ? -0.05 : 0) + (I.b ? 0.08 : 0); // клевок при гальмуванні
+      player.bodyGroup.rotation.z = -steerInput * 0.12 * (pv / maxSpeed);
+      player.bodyGroup.rotation.x = (I.g ? -0.05 : 0) + (I.b ? 0.08 : 0);
       player.antenna.rotation.z = steerInput * 0.35;
-      player.antenna.rotation.x = -(pv / maxSpeed) * 0.45 + Math.sin(now * 0.015) * 0.05;
-
-      // Обертання коліс
+      player.antenna.rotation.x = -(pv / maxSpeed) * 0.45 + Math.sin(elapsed * 12) * 0.05;
       player.wheels.forEach(w => w.rotation.x += pv * 0.25);
 
-      // Прогрес гравця
       const q = getProgress(px, pz);
       if (q > pts.length - 1 && pProg < 1.5) {
         pLap++;
@@ -385,7 +399,6 @@
       }
       pProg = q;
 
-      // Логіка бонусних боксів
       pickups.forEach(p => {
         if (!p.active) {
           p.respawn -= dt;
@@ -395,14 +408,12 @@
           }
         } else {
           p.mesh.rotation.y += 2 * dt;
-          p.mesh.rotation.x += 1.2 * dt;
-          p.mesh.position.y = 1.2 + Math.sin(now * 0.005) * 0.25;
+          p.mesh.position.y = 1.2 + Math.sin(elapsed * 3) * 0.25;
 
-          const dist = Math.hypot(px - p.mesh.position.x, pz - p.mesh.position.z);
-          if (dist < 2.3) {
+          if (Math.hypot(px - p.mesh.position.x, pz - p.mesh.position.z) < 2.3) {
             p.active = false;
             p.mesh.visible = false;
-            p.respawn = 6; // респавн через 6 секунд
+            p.respawn = 6;
             if (!hasItem) {
               hasItem = true;
               document.getElementById('powerup-slot').textContent = '⚡';
@@ -412,24 +423,23 @@
         }
       });
 
-      // Рух AI суперників
       aiCars.forEach(ai => {
         const target = pts[ai.targetIdx];
         const tdx = target[0] - ai.x;
         const tdz = target[1] - ai.z;
         const targetAngle = Math.atan2(tdx, tdz);
 
-        let angleDiff = targetAngle - ai.a;
-        while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
-        while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+        let diff = targetAngle - ai.a;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
 
-        ai.a += Math.sign(angleDiff) * Math.min(Math.abs(angleDiff), 3.0 * dt);
+        ai.a += Math.sign(diff) * Math.min(Math.abs(diff), 3.0 * dt);
         ai.x += Math.sin(ai.a) * ai.v * dt;
         ai.z += Math.cos(ai.a) * ai.v * dt;
 
         ai.car.root.position.set(ai.x, 0.05, ai.z);
         ai.car.root.rotation.y = ai.a;
-        ai.car.antenna.rotation.x = -0.25 + Math.sin(now * 0.01 + ai.x) * 0.05;
+        ai.car.antenna.rotation.x = -0.25 + Math.sin(elapsed * 10 + ai.x) * 0.05;
         ai.car.wheels.forEach(w => w.rotation.x += ai.v * 0.25);
 
         if (Math.hypot(tdx, tdz) < 4.5) {
@@ -441,7 +451,6 @@
         ai.prog = aiQ;
       });
 
-      // Позиція в гонці
       const playerTotalScore = (pLap - 1) * pts.length + pProg;
       let rank = 1;
       aiCars.forEach(ai => {
@@ -449,12 +458,10 @@
         if (aiScore > playerTotalScore) rank++;
       });
 
-      // Оновлення HUD
       document.getElementById('s').textContent = Math.round(Math.abs(pv) * 8);
       document.getElementById('l').textContent = Math.min(pLap, 3);
       document.getElementById('pos').textContent = rank;
 
-      // Динамічна камера
       const camTarget = new THREE.Vector3(
         px - Math.sin(pa) * 8.5,
         4.8,
@@ -465,13 +472,13 @@
 
       R.render(S, C);
     }
-    tick(performance.now());
+    tick();
 
-    window.onresize = () => {
-      C.aspect = innerWidth / innerHeight;
+    window.addEventListener('resize', () => {
+      C.aspect = window.innerWidth / window.innerHeight;
       C.updateProjectionMatrix();
-      R.setSize(innerWidth, innerHeight);
-    };
+      R.setSize(window.innerWidth, window.innerHeight);
+    });
   </script>
 </body>
 </html>
